@@ -1,4 +1,4 @@
-Programming Assignment 1: Application Level file sharing protocol with support for upload/download and indexed searching.
+Application Level file sharing protocol with support for upload/download and indexed searching.
 
 Specifications
 
