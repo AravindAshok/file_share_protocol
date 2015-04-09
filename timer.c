@@ -1,8 +1,8 @@
 /***************************************************************************
-*Author:                                                                   
+*Author:  Aravind Ashok                                                                 
 *Date:                                                                     
 *Filename:                                                                 
-*Description:                                                              
+*Description: Helper function for timing                                                             
                                                                            
                                                                            
 ***************************************************************************/

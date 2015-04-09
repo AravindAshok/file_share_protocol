@@ -1,8 +1,8 @@
 /***************************************************************************
-*Author:                                                                   
+*Author: Aravind Ashok                                                                  
 *Date:                                                                     
 *Filename:                                                                 
-*Description:                                                              
+*Description: command parsing to generate requests                                                             
                                                                            
                                                                            
 ***************************************************************************/
