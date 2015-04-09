@@ -25,3 +25,40 @@ static const char *requests={"IndexGet",
 int process_init(char* file, char* output){
     FILE*
 }
+
+void print_md5_hash(uint8_t *hash){
+
+}
+
+void print_data_pkt(data_packet_t* pkt){
+
+}
+
+int is_chunk_finished(chunk_t* chunk){
+
+}
+
+void cat_chunks(){
+
+}
+
+void store_data(){
+
+
+}
+
+/**********--------------*/
+void packet_send(){
+
+
+}
+
+void send_(){
+
+}
+
+data_packet_t *generate_packet(){
+
+}
+
+
