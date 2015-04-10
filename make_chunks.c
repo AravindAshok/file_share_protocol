@@ -31,7 +31,7 @@ int main(int argc, char *argv){
 
     //sanity testing
     if (numchunks < 0 || fp == NULL){
-        fprintf(stderr, "file error: %s", strerror(errno));
+        fprintf(stderr, "file error for %s: %s", input_file, strerror(errno));
         exit(-1);
     }
 
