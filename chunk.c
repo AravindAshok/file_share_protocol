@@ -8,6 +8,13 @@
 ***************************************************************************/
 
 void md5_hash(uint8_t *str, int len, uint8_t *hash){
+    struct md5_ctx ctx;
+    unsigned char digest(16);
+
+    md5_init(&ctx);
+
+    ctx.size = len ? len:strlen(chaine);
+    strcpy(ctx.buf, chaine);
 
 
 
