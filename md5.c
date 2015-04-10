@@ -300,3 +300,8 @@ static void md5_memset (unsigned char *p, const unsigned char c, const unsigned 
                  p [i] = c;
          }
  }
+
+
+int main(){
+
+}
