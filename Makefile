@@ -4,9 +4,10 @@
 #Description: builds and compiles the necessary files
 #####################################################################################
 
-CFLAGS = -Wall -g
-CC := gcc
+CFLAGS  = -g -Wall -DDEBUG -03
+CC      = gcc
 LDFLAGS = 
+OBJS    =
 
 SDIR = 
 
