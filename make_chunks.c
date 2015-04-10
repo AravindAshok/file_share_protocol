@@ -1,8 +1,8 @@
 /***************************************************************************
-*Author:
-*Date:
-*Filename:
-*Description:
+*Author: Kiran Kumar Lekkala
+*Date: 10 April 2015
+*Filename: make_chunks.c
+*Description: Driver program to make chunks from a file
 
 
 ***************************************************************************/
@@ -13,6 +13,8 @@
 #include<unistd.h>
 #include<stdlib.h>
 
+#include "md-5.h"
+#include "chunk.h"
 
 static int num_chunks();
 
