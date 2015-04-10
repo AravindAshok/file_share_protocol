@@ -26,7 +26,10 @@ chunk:
 connection:
 
 
-
+spiffy:
+	$(CC) -c -Wall spiffy.c -o spiffy.o
+	$(CC) test_server.c spiffy.o -o server
+	$(CC) test_client.c spiffy.o -o client
 
 all: 
 	$(CC) -o -Wall 
