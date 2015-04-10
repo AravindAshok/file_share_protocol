@@ -6,6 +6,13 @@
 
 CC := gcc
 
+SDIR = 
+
+INCLUDEDIR = 
+LIBDIR = 
+
+
+
 
 all: 
 	$(CC) -o -Wall 
