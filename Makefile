@@ -7,7 +7,7 @@
 CFLAGS  = -g -Wall -DDEBUG -03
 CC      = gcc
 LDFLAGS = 
-OBJS    =
+OBJS    = peer.o debug.o
 
 SDIR = 
 
