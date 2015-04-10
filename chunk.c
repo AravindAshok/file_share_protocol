@@ -29,5 +29,8 @@ int main(int argc, char *argv[]){
 
     md5_hash(test, 4, hash);
 
-    binary2
+    binary2hex(hash,MD5_HASH_SIZE,ascii);
+
+    printf("%s\n", ascii);
+    assert
 }
