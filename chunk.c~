@@ -1,16 +1,13 @@
-
-#ifndef _CHUNK_H_
-#define _CHUNK_H_
-#include <stdio.h>
-#include <inttypes.h>
-
-#define CHUNK_SIZE (512 * 1024)
-
-#define ascii2hex(ascii, len, buf) hex2binary((ascii), (len), (buf))
+/***************************************************************************
+*Author: Kiran Kumar Lekkala
+*Date:  11 April 2015
+*Filename: chunk.c
+*Description: Divides a file to packets
 
 
-#ifdef __cplusplus
-extern "C"
+***************************************************************************/
+
+
 
 int make_chunks(FILE *fp, uint8_t **chunk_hashes);
 
