@@ -4,7 +4,9 @@
 #Description: builds and compiles the necessary files
 #####################################################################################
 
+CFLAGS = -Wall -g
 CC := gcc
+LDFLAGS = 
 
 SDIR = 
 
