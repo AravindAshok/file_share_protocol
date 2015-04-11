@@ -41,6 +41,7 @@ int make_chunks(FILE *fp, uint8_t *chunk_hashes){
 }
 }
 
+
 int main(int argc, char *argv[]){
     uint8_t *test = "test";
     uint8_t hash1[MD5_HASH_SIZE], hash2[MD5_HASH_SIZE];
@@ -51,5 +52,6 @@ int main(int argc, char *argv[]){
     binary2hex(hash,MD5_HASH_SIZE,ascii);
 
     printf("%s\n", ascii);
-    assert
+    //assert
+
 }

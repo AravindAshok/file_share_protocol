@@ -1,4 +1,4 @@
-Application Level file sharing protocol with support for upload/download and indexed searching.
+###Application Level file sharing protocol with support for upload/download and indexed searching.
 
 Specifications
 
@@ -6,12 +6,12 @@ Problem Setting: Two network clients listening for requests waiting to share fil
 Approach to be used: Design an application layer protocol like FTP/HTTP to enable this
 
 Goals of the assignment: To enable two clients to:
--Know list of files on each other's machines in designate shared folders
--Upload a file to each other
--Download a file to each other
--Periodically check for changes in the shared folder
--Application level error checking using MD5 checksum
--Enable both TCP and/or UDP based transport of files as per client requests
+*Know list of files on each other machines in designate shared folders
+*Upload a file to each other
+*Download a file to each other
+*Periodically check for changes in the shared folder
+*Application level error checking using MD5 checksum
+*Enable both TCP and/or UDP based transport of files as per client requests
 
 Specifications:
 
