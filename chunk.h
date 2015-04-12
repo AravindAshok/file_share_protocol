@@ -22,4 +22,4 @@ void md-5_hash(uint8_t *chr, int len, uint8_t *t);
 void bin2hex(uint8_t *buf, int len, char *ascii);
 
 /* converts an ascii to hex */
-void ascii2hex(char *ascii, int len, uint8_t *buf);
+void hex2bin(char *ascii, int len, uint8_t *buf);
