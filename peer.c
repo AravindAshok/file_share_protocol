@@ -1,6 +1,6 @@
 /***************************************************************************
 *Author:  Kiran Kumar Lekkala
-*Date:  13 April 2015
+*Date:  15 April 2015
 *Filename: peer.c
 *Description: main program for file share protocol
 
