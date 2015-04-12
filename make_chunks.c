@@ -42,7 +42,7 @@ int main(int argc, char *argv){
     }
 
     for(i=0;i<numchunks;i++){
-    hashes[i] = calloc(sizeof(uint8_t), (SHA1_HASH_SIZE))
+    hashes[i] = calloc(sizeof(uint8_t), (MD5_HASH_SIZE))
 
     if(hashes[i] == NULL){
         fprintf(stderr, "Out of memory !!");
