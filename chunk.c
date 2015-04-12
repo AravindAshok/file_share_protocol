@@ -28,7 +28,17 @@ void bin2hex(uint8_t *buf, int len, uint8_t *hex){
     hex[len*2] = 0;
 }
 
-void hex2bin(char *hex, int len, uint8_t *buf)
+void hex2bin(char *hex, int len, uint8_t *buf){
+    hex = toupper(hex);
+    uint8_t b;
+    if(hex<= '9')
+        b = hex-'0';
+    else{
+        b = hex-('A'-0x0A);
+    }
+
+    return b;
+}
 int make_chunks(FILE *fp, uint8_t *chunk_hashes){
 
     uint8_t *buffer = (uint8_t*) malloc(CHUNK_SIZE);
