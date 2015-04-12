@@ -36,7 +36,7 @@ peer: $(OBJS)
 
 ## debugging utility code for this project
 
-debug-text:
+debug-textdebug-text:
 
 
 
