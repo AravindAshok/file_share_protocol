@@ -34,8 +34,6 @@ clean:
 peer: $(OBJS)
 	$(CC) $(c)
 
-md-5:
-
 
 current_process:
 
