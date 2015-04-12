@@ -12,7 +12,6 @@ MK_CHUNK_OBJS = make_chunks.o chunk.o md5.o
 
 BINS          = peer make_chunks
 TESTBINS      = test_input.o
-SDIR = 
 
 INCLUDEDIR = 
 LIBDIR = 
@@ -32,6 +31,8 @@ test: peer_test
 timer: timer.c timer.h
 	$(CC) timer.c ${INCLUDES} ${CFLAGS} -c -
 
+clean:
+	rm -f *.o $(BINS) $(TESTBINS)
 
 peer:
 
