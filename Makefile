@@ -22,7 +22,6 @@ LIBDIR =
 
 all: ${BINS} ${TESTBINS}
 
-
 run: peer_run
 
 test: peer_test
