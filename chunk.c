@@ -57,15 +57,13 @@ int main(int argc, char *argv[]){
     uint8_t hash1[MD5_HASH_SIZE], hash2[MD5_HASH_SIZE];
     char ascii[MD5_HASH_SIZE*2 + 1];
 
-    md5_hash(test, 4, hash);
+    md5_hash(test, 4, hash1);
 
     binary2hex(hash,MD5_HASH_SIZE,ascii);
     printf("%s\n",ascii);
 
     assert(strlen(ascii)==40);
-    hex2binary(ascii, strlen(ascii), hash)
+    hex2bin(ascii, strlen(ascii), hash)
 
     printf("%s\n", ascii);
-    //assert
-
 }
