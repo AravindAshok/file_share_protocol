@@ -34,7 +34,8 @@ timer: timer.c timer.h
 clean:
 	rm -f *.o $(BINS) $(TESTBINS)
 
-peer:
+peer: $(OBJS)
+	$(CC) $(c)
 
 md-5:
 
