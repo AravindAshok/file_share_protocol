@@ -15,7 +15,6 @@ TESTBINS      = test_input
 
 LIBDIR = 
 
-
 .c.o:
 	$(CC) $(TEST) -c $(CFLAGS) $<
 
