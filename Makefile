@@ -34,8 +34,9 @@ clean:
 peer: $(OBJS)
 	$(CC) $(c)
 
+## debugging utility code for this project
 
-:
+debug-text:
 
 
 
