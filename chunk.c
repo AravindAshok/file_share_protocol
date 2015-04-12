@@ -28,7 +28,7 @@ void bin2hex(uint8_t *buf, int len, uint8_t *hex){
     hex[len*2] = 0;
 }
 
-
+void hex2bin(char *hex, int len, uint8_t *buf)
 int make_chunks(FILE *fp, uint8_t *chunk_hashes){
 
     uint8_t *buffer = (uint8_t*) malloc(CHUNK_SIZE);
@@ -39,7 +39,7 @@ int make_chunks(FILE *fp, uint8_t *chunk_hashes){
         md5_hash(buffer, sizeof(uint8_t),
     }
 }
-}
+
 
 
 int main(int argc, char *argv[]){
