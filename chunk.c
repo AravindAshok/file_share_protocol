@@ -36,8 +36,9 @@ int make_chunks(FILE *fp, uint8_t *chunk_hashes){
     int numchunks = 0;
     int numbytes = 0;
 
-    /* read the bytes from the file and fill in the chunk hashes */
-    while((numbytes = fread(buffer)))
+    while((numbytes = fread(buffer))){
+        md5_hash(buffer, sizeof(uint8_t),
+    }
 }
 }
 
