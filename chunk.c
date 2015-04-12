@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-void md5_hash(uint8_t *str, int len, uint8_t *hash){
+void md5_hash(uint8_t *chaine, int len, uint8_t *hash){
     struct md5_ctx ctx;
     unsigned char digest(16);
 
@@ -49,7 +49,6 @@ int make_chunks(FILE *fp, uint8_t *chunk_hashes){
         md5_hash(buffer, sizeof(uint8_t),
     }
 }
-
 
 
 int main(int argc, char *argv[]){
