@@ -12,7 +12,6 @@ void md5_hash(uint8_t *chaine, int len, uint8_t *hash){
 
     //init the md5 process
     md5_init(&ctx);
-
     ctx.size = len ? len:strlen(chaine);
     strcpy(ctx.buf, chaine);
     md5_update(&ctx);
