@@ -35,7 +35,7 @@ peer: $(OBJS)
 	$(CC) $(c)
 
 
-current_process:
+:
 
 
 
