@@ -17,7 +17,20 @@ SDIR =
 INCLUDEDIR = 
 LIBDIR = 
 
-timer:
+
+.c.o:
+	$(CC) $(TEST) -c $(CFLAGS) $<
+
+all: ${BINS} ${TESTBINS}
+
+
+run: peer_run
+
+test: peer_test
+	./peer_test
+
+timer: timer.c timer.h
+	$(CC) timer.c ${INCLUDES} ${CFLAGS} -c -
 
 
 peer:
@@ -26,10 +39,6 @@ md-5:
 
 
 current_process:
-
-chunk:
-
-connection:
 
 
 all: 
