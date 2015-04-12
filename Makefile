@@ -32,11 +32,11 @@ clean:
 	rm -f *.o $(BINS) $(TESTBINS)
 
 peer: $(OBJS)
-	$(CC) $(c)
+	$(CC) 
 
 ## debugging utility code for this project
 
-debug-textdebug-text:
+debug-text:
 
 
 
