@@ -13,8 +13,8 @@
 static const char *requests={"IndexGet RegEx",
                              "IndexGet ShortList",
                              "IndexGet Longlist",
-                             "Verify",
-                             "Check_All",
+                             "FileHash Verify",
+                             "FileHash Check_All",
                              "FileDownload",
                              "FileUpload" };
 
