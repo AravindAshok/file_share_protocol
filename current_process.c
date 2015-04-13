@@ -48,6 +48,43 @@ void store_data(){
 
 }
 
+
+queue_t* GET_maker(data_packet_t *ihave_pkt, bt_peer_t* provider,
+                                             queue_t* chunk_queue) {
+    assert(ihave_pkt->header.packet_type == PKT_IHAVE);
+    int num = ihave_pkt->data[0]; // num of chunk that peer has
+    //int num_match = 0;
+    int i;
+    int match_idx;
+    chunk_t* chk = job.chunks;  // the needed chunk here
+    queue_t *q;      // the queue of GET request
+    data_packet_t* pkt; // GET packet
+    uint8_t *hash;   // the incoming hash waiting to match my needs
+    if (0 == num)
+        return NULL;
+
+    q = queue_init();
+    hash = (uint8_t *)(ihave_pkt->data + 4); // the start of hash
+    for (i = 0; i < num; i++) {
+        match_idx = match_need(hash);
+        if (-1 != match_idx) {
+            chk[match_idx].pvd = provider;
+            chk[match_idx].num_p = 1;
+            job.num_living |= (1 << match_idx);   // this chunks is living
+            pkt = packet_maker(PKT_GET,
+                               HEADERLEN + SHA1_HASH_SIZE,
+                               0, 0, (char *)hash);
+            enqueue(q, (void *)pkt);
+            enqueue(chunk_queue,(void*)(chk+match_idx));
+            if (config.peers->next->next != NULL)
+                return q;
+        }
+        hash += SHA1_HASH_SIZE;
+    }
+    return q;
+}
+
+
 /**********--------------*/
 void packet_send(){
 
