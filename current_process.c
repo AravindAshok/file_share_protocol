@@ -35,9 +35,30 @@ void print_data_pkt(data_packet_t* pkt){
 
 }
 
-int is_chunk_finished(chunk_t* chunk){
+int is_chunk_finished(chunk_t* chunk) {
+    int cur_size = chunk->cur_size;
+    float kb = cur_size / 1024;
+    if (VERBOSE)
+        fprintf(stderr, "check finished!!!\n");
+    if (cur_size != CHUNK_SIZE) {
+        if (VERBOSE)
+            fprintf(stderr, "Not finished yet, cur_size = %.5f\n", kb);
 
+        return 0;
+    }
+    uint8_t hash[SHA1_HASH_SIZE];
+    // get hash code
+    shahash((uint8_t*)chunk->data,cur_size,hash);
+    // check hash code
+
+    if( memcmp(hash,chunk->hash,SHA1_HASH_SIZE) == 0) {
+        return 1;
+    } else {
+        return -1;
+
+    }
 }
+
 
 void cat_chunks(){
 
