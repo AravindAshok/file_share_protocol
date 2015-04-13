@@ -105,7 +105,7 @@ queue_t* GET_maker(data_packet_t *ihave_pkt, bt_peer_t* provider,
 }
 
 
-/**********--------------*/
+/******************************************************************/
 void packet_sender(data_packet_t* pkt, struct sockaddr* to) {
     int pkt_size = pkt->header.packet_len;
     int type = pkt->header.packet_type;
@@ -116,6 +116,9 @@ void packet_sender(data_packet_t* pkt, struct sockaddr* to) {
     spiffy_sendto(config.sock, pkt, pkt_size, 0, to, sizeof(*to));
     netToHost(pkt);
 }
+
+/*******************************************************************/
+
 
 void local2net(data_packet_t* pkt) {
     pkt->header.magicnum = htons(pkt->header.magicnum);
