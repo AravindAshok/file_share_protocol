@@ -10,9 +10,10 @@
 
 
 
-static const char *requests={"IndexGet RegEx",
-                             "IndexGet ShortList",
-                             "IndexGet Longlist",
+static const char *requests={"IndexGet",
+                             "ShortList",
+                             "Longlist",
+                             "RegEx",
                              "Verify",
                              "Check_All",
                              "FileDownload",
