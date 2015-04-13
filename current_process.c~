@@ -125,7 +125,10 @@ void hostToNet(data_packet_t* pkt) {
     pkt->header.ack_num = htonl(pkt->header.ack_num);
 }
 
-
+/** @brief Convert data from network format to local format
+ *  @param pkt pkt to be send
+ *  @return void
+ */
 void netToHost(data_packet_t* pkt) {
     pkt->header.magicnum = ntohs(pkt->header.magicnum);
     pkt->header.header_len = ntohs(pkt->header.header_len);
