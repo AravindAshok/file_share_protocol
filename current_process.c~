@@ -152,7 +152,7 @@ void print_pkt(data_packet_t* pkt) {
     uint8_t* hash;
     int num;
     int i;
-    fprintf(stderr, "**************START**********\n");
+    fprintf(stderr, ">>>>>>>>>START<<<<<<<<<<<<<\n");
     fprintf(stderr, "magicnum:\t\t%d\n", hdr->magicnum);
     fprintf(stderr, "version:\t\t%d\n", hdr->version);
     fprintf(stderr, "packet_type:\t\t%d\n", hdr->packet_type);
