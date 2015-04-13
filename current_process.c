@@ -86,10 +86,17 @@ queue_t* GET_maker(data_packet_t *ihave_pkt, bt_peer_t* provider,
 
 
 /**********--------------*/
-void packet_send(){
-
-
+void packet_sender(data_packet_t* pkt, struct sockaddr* to) {
+    int pkt_size = pkt->header.packet_len;
+    int type = pkt->header.packet_type;
+    if (VERBOSE)
+        fprintf(stderr, "send %s pkt!*********\n", type2str[type]);
+    print_pkt(pkt);
+    hostToNet(pkt);
+    spiffy_sendto(config.sock, pkt, pkt_size, 0, to, sizeof(*to));
+    netToHost(pkt);
 }
+
 
 void send_(){
 
