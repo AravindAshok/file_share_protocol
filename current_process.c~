@@ -126,30 +126,4 @@ data_packet_t *generate_packet(){
 
 }
 
-void print_pkt(data_packet_t* pkt) {
-    if (VERBOSE != 1)
-        return;
-    header_t* hdr = &pkt->header;
-    uint8_t* hash;
-    int num;
-    int i;
-    fprintf(stderr, ">>>>>>>>>START<<<<<<<<<<<<<\n");
-    fprintf(stderr, "magicnum:\t\t%d\n", hdr->magicnum);
-    fprintf(stderr, "version:\t\t%d\n", hdr->version);
-    fprintf(stderr, "packet_type:\t\t%d\n", hdr->packet_type);
-    fprintf(stderr, "header_len:\t\t%d\n", hdr->header_len);
-    fprintf(stderr, "packet_len:\t\t%d\n", hdr->packet_len);
-    fprintf(stderr, "seq_num:\t\t%d\n", hdr->seq_num);
-    fprintf(stderr, "ack_num:\t\t%d\n", hdr->ack_num);
-    if (PKT_WHOHAS == hdr->packet_type || PKT_IHAVE == hdr->packet_type) {
-        num = pkt->data[0];
-        fprintf(stderr, "1st bytes data:\t\t%x\n", pkt->data[0]);
-        hash = (uint8_t *)(pkt->data + 4);
-        for (i = 0; i < num; i++) {
-            print_hash(hash);
-            hash += SHA1_HASH_SIZE;
-        }
-    }
-    fprintf(stderr, ">>>>>>>>>END<<<<<<<<<<<<<\n");
-}
 
