@@ -46,6 +46,8 @@ typedef struct chunk_s {
  
 // num_chunk * 512 * 1024 = file_size;max num_chunk = 4095
 // largest file supports is 2GB - 512KB
+
+
 typedef struct job_s {
     int num_chunk;   
     int num_need;
@@ -70,6 +72,7 @@ typedef struct data_packet {
     char data[DATALEN];
 } data_packet_t;
 
+
 int init_job(char* chunkFile, char* output_file);
 int is_job_finished();
 int IfIHave(uint8_t *hash_start);
@@ -90,8 +93,8 @@ void store_data(chunk_t* chunk, data_packet_t* pkt);
 void cat_chunks();
 int is_chunk_finished(chunk_t* chunk);
 void packet_free(data_packet_t *pkg);
-void hostToNet(data_packet_t* pkt);
-void netToHost(data_packet_t* pkt);
+void local2net(data_packet_t* pkt);
+void net2local(data_packet_t* pkt);
 void print_pkt(data_packet_t* pkt);
 void print_hash(uint8_t *hash);
 void hostToNet(data_packet_t* pkt);
