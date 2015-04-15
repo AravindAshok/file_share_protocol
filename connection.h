@@ -25,10 +25,9 @@
 #define DATALEN         PACKETLEN - HEADERLEN
 #define MAX_CHUNK		74   //Max number of chunk in a single whohas pkt
 #define BUF_SIZE        60
-#define PKT_WHOHAS 		0
-#define PKT_IHAVE		1
-#define PKT_GET			2
-#define PKT_DATA		3
+#define PKT_Index_Get 		0
+#define PKT_FileDownload			2
+#define PKT_FileUpload		3
 #define PKT_ACK 		4
 #define PKT_DENIED		5      
 #define CHUNK_SIZE      (1 << 19)  //size of a single chunk in Bytes
