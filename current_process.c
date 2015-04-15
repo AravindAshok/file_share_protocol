@@ -96,7 +96,7 @@ queue_t* GET_maker(peer_t* provider, queue_t* chunk_queue) {
     queue_t *q;      // the queue of GET request
     data_packet_t* pkt; // GET packet
     uint8_t *hash;   // the incoming hash waiting to match my needs
-    if (0 == num)
+    if (num == 0) //sort of tagpoint...
         return NULL;
 
     q = queue_init();
