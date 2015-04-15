@@ -1,6 +1,5 @@
 /***************************************************************************
 *Author-1: Kiran Kumar Lekkala
-*Author-2: Aravind Ashok
 *Date: 13 April 2015
 *Filename: current_process.c
 *Description: takes care of the current process it handles
@@ -20,6 +19,21 @@ static const char *requests={"IndexGet RegEx",
 
 
 
+data_packet_t *generate_packet(int type, short pkt_len, u_int seq,
+                            u_int ack, char *data) {
+    data_packet_t *pkt = (data_packet_t *)malloc(sizeof(data_packet_t));
+    pkt->header.magicnum = 4399; /* Magic number */
+    pkt->header.version = 1;      /* Version number */
+    pkt->header.packet_type = type; /* Packet Type */
+    pkt->header.header_len = HEADERLEN;    /* Header length is always 16 */
+    pkt->header.packet_len = pkt_len;
+    pkt->header.seq_num = seq;
+    pkt->header.ack_num = ack;
+    if( pkt->data != NULL) 
+        memcpy(pkt->data, data, pkt_len - HEADERLEN);
+    return pkt;
+}
+
 
 
 int process_init(char* file, char* output){
@@ -30,9 +44,6 @@ void print_md5_hash(uint8_t *hash){
 
 }
 
-void print_data_pkt(data_packet_t* pkt){
-
-}
 
 int is_chunk_finished(chunk_t* chunk) {
     int cur_size = chunk->cur_size;
@@ -45,9 +56,9 @@ int is_chunk_finished(chunk_t* chunk) {
 
         return 0;
     }
-    uint8_t hash[SHA1_HASH_SIZE];
+    uint8_t hash[MD5_HASH_SIZE];
     // get hash code
-    shahash((uint8_t*)chunk->data,cur_size,hash);
+    md5hash((uint8_t*)chunk->data,cur_size,hash);
     // check hash code
 
     if( memcmp(hash,chunk->hash,SHA1_HASH_SIZE) == 0) {
@@ -68,9 +79,14 @@ void store_data(){
 
 }
 
+void pkt2chunk(chunk_t* chunk, data_packet_t* pkt) {
+    int size = pkt->header.packet_len - pkt->header.header_len;
+    memcpy(chunk->data+chunk->cur_size,pkt->data,size);
+    chunk->cur_size += size;
+}
 
-queue_t* GET_maker(data_packet_t *ihave_pkt, bt_peer_t* provider,
-                                             queue_t* chunk_queue) {
+
+queue_t* GET_maker(peer_t* provider, queue_t* chunk_queue) {
     assert(ihave_pkt->header.packet_type == PKT_IHAVE);
     int num = ihave_pkt->data[0]; // num of chunk that peer has
     //int num_match = 0;
@@ -99,7 +115,7 @@ queue_t* GET_maker(data_packet_t *ihave_pkt, bt_peer_t* provider,
             if (config.peers->next->next != NULL)
                 return q;
         }
-        hash += SHA1_HASH_SIZE;
+        hash += MD5_HASH_SIZE;
     }
     return q;
 }
