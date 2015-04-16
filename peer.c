@@ -7,18 +7,6 @@
 
 ***************************************************************************/
 
-/*
- * peer.c
- *
- * Authors: Ming Fang <mingf@cs.cmu.edu>,
- *          Yao Zhou <yaozhou@cs.cmu.edu>
- *          
- * Class: 15-441 (Fall 2014)
- *
- * Skeleton for 15-441 Project 2.
- *
- */
-
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
