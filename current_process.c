@@ -150,7 +150,7 @@ data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt) {
     fstat (data_fd, &statbuf);
     src = mmap(0, statbuf.st_size, PROT_READ, MAP_SHARED, data_fd, 0);
     close(data_fd);
-    binary2hex((uint8_t*)pkt->data,SHA1_HASH_SIZE,hash_hex);
+    bin2hex((uint8_t*)pkt->data,MD5_HASH_SIZE,hash_hex);
     while(fgets(buffer,60,index_file) != NULL) {
         if(sscanf(buffer,"%s %s\n",index_buffer,hash_buffer) < 2 ) {
             // wrong file format!
