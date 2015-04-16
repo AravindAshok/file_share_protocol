@@ -120,6 +120,63 @@ int is_chunk_finished(chunk_t* chunk) {
     }
 }
 
+data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt) {
+    data_packet_t** data_pkt_array = (data_packet_t**)calloc(sizeof(data_packet_t*),512);
+    int index = 0, i = 0;
+    char hash_buffer[HASH_HEX_SIZE] = {0};
+    char hash_hex[HASH_HEX_SIZE] = {0};
+    char buffer[BT_FILENAME_LEN+5] = {0};
+    char datafile[BT_FILENAME_LEN] = {0};
+    char index_buffer[5] = {0};
+    char *src;
+    struct stat statbuf;
+
+    FILE* index_file = fopen(config.chunk_file,"r");
+    int data_fd;
+
+    if(index_file == NULL) {
+        fprintf(stderr, "Fail to open chunk file!!\n"); 
+        return NULL;
+    }
+    // get data file address
+    fgets(buffer,BT_FILENAME_LEN,index_file);
+
+    sscanf(buffer,"File: %s\n",datafile);
+    // skip the next line
+    fgets(buffer,BT_FILENAME_LEN,index_file);
+
+    // open file to read 
+    data_fd = open(datafile, O_RDONLY);
+    fstat (data_fd, &statbuf);
+    src = mmap(0, statbuf.st_size, PROT_READ, MAP_SHARED, data_fd, 0);
+    close(data_fd);
+    binary2hex((uint8_t*)pkt->data,SHA1_HASH_SIZE,hash_hex);
+    while(fgets(buffer,60,index_file) != NULL) {
+        if(sscanf(buffer,"%s %s\n",index_buffer,hash_buffer) < 2 ) {
+            // wrong file format!
+            fprintf(stderr, "wrong file format!\n");
+            fclose(index_file);
+            munmap(src,statbuf.st_size);
+            return NULL;
+        } else {
+            if(memcmp(hash_hex,hash_buffer,HASH_HEX_SIZE) == 0) {
+                index = atoi(index_buffer);
+                //fseek(data_file,index,SEEK_SET);
+                for (i = 0;i < 512;i++) {
+                    // load data
+                    data_pkt_array[i] = packet_maker(PKT_DATA,
+                                                1040,i+1,0,
+                                                src+index*CHUNK_SIZE+i*1024);
+                }
+                munmap(src,statbuf.st_size);
+                print_pkt((data_packet_t*)(data_pkt_array[0]));
+                return data_pkt_array;
+            }
+        }
+    }
+    return NULL;
+}
+
 
 void cat_chunks(){
 
