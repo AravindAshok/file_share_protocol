@@ -18,6 +18,57 @@ static const char *requests={"IndexGet RegEx",
                              "FileUpload" };
 
 
+int init_job(char* chunkFile, char* output_file) {
+    FILE* file = fopen(chunkFile,"r");
+    if( file == NULL)
+        return -1; // fail to open job file
+
+    int line_number = 0;
+    int i = 0;
+    char read_buffer[BUF_SIZE];
+    char hash_buffer[SHA1_HASH_SIZE*2];
+
+    
+    /* get chunks number */
+    while (fgets(read_buffer, BUF_SIZE,file)) {
+        line_number++;
+    }
+    memset(read_buffer,0,BUF_SIZE);
+    
+    job.num_chunk = line_number;
+    job.num_need = line_number;
+    job.num_living = 0;
+    job.chunks = malloc(sizeof(chunk_t) * job.num_chunk);
+    
+    /* set ptr to the beginning */
+    fseek(file,0,SEEK_SET);
+    
+    while (fgets(read_buffer,BUF_SIZE,file)) {
+        sscanf(read_buffer,"%d %s",&(job.chunks[i].id),hash_buffer);
+        /* convert ascii to binary hash code */
+        hex2binary(hash_buffer,SHA1_HASH_SIZE*2,job.chunks[i].hash);        
+        memset(read_buffer,0,BUF_SIZE);
+        memset(hash_buffer,0,SHA1_HASH_SIZE*2);
+        job.chunks[i].pvd = NULL;
+        job.chunks[i].num_p = 0;
+        job.chunks[i].cur_size = 0;
+        job.chunks[i].data = malloc(sizeof(char)*512*1024);
+        i++;
+    }    
+    fclose(file);
+    // set output file address and format
+    strcpy(config.output_file,output_file);
+    strcpy(job.get_chunk_file,chunkFile);
+    config.output_file[strlen(output_file)] = '\0';
+    job.get_chunk_file[strlen(job.get_chunk_file)] = '\0';
+
+    //gettimeofday(&(job.start_time), NULL);
+    //fprintf(job.cwnd, "Start!\n");
+    
+    // successfully initilize job
+    return 0;
+}
+
 
 data_packet_t *generate_packet(int type, short pkt_len, u_int seq,
                             u_int ack, char *data) {
