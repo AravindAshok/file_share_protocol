@@ -16,12 +16,12 @@
 #include <string.h>
 #include "debug.h"
 #include "spiffy.h"
-#include "bt_parse.h"
+#include "parse.h"
 #include "input_buffer.h"
 #include "queue.h"
 #include "job.h"
 #include "chunk.h"
-#include "conn.h"
+#include "connection.h"
 
 /* Function Prototypes */
 void peer_run();
@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 }
 
 
-void process_inbound_udp(int sock) {
+void process_tcp(int sock) {
     int packet_type = -1;
     struct sockaddr_in from;
     socklen_t fromlen;
@@ -78,11 +78,11 @@ void process_inbound_udp(int sock) {
 
 
     fromlen = sizeof(from);
-    while ((res = spiffy_recvfrom(sock, buf, PACKETLEN,
+    while ((res = TCP_recvfrom(sock, buf, PACKETLEN,
                                   0, (struct sockaddr *) &from,
                                   &fromlen)) != -1) {
         // change to local format
-        netToHost((data_packet_t*)buf);
+        net2local((data_packet_t*)buf);
         // call packet_parser
         packet_type = packet_parser(buf);
         //get peer
@@ -90,62 +90,8 @@ void process_inbound_udp(int sock) {
         //print_pkt((data_packet_t*)buf);
         // switch on packet type
         switch(packet_type) {
-            // case WhoHas
-            case PKT_WHOHAS: {
 
-                fprintf(stderr, "receive whoHas pkt!!!!\n");
-
-                // Construct I have response pkt
-                data_packet_t* pkt = IHave_maker((data_packet_t*)buf);
-                if( pkt != NULL) {
-                    // Send it back
-                    packet_sender(pkt, (struct sockaddr *) &from);
-                    packet_free(pkt);
-                }
-                break;
-            }
-            case PKT_IHAVE: {
-                // Construct Get Pkt response 
-                queue_t* chunk_queue = queue_init();
-                queue_t* get_Pkt_Queue = GET_maker((data_packet_t*)buf,
-                                                    peer,chunk_queue);
-                // check if needed to create new download connection
-                if( get_Pkt_Queue->n == 0) {
-                    // no need!
-                    free_queue(chunk_queue);
-                    free_queue(get_Pkt_Queue);
-                
-                } else {
-                    // check if this provider is already in our conn_pool
-
-                    if (NULL != (down_conn = get_down_conn(&down_pool, peer))) {
-                        if (VERBOSE)
-                            fprintf(stderr, "About to enqueue GET\n");
-                        while ((pkt = (data_packet_t*)dequeue(get_Pkt_Queue))) {
-                            enqueue(down_conn->get_queue, (void*)pkt);
-                            enqueue(down_conn->chunks, dequeue(chunk_queue));
-                            if (VERBOSE)
-                                fprintf(stderr, "One GET enqueued\n");              
-                        }
-                        free_queue(chunk_queue);
-                        free_queue(get_Pkt_Queue);                                     
-                        break;
-                    }
-
-                    // add new downloading connection
-                    if((down_conn = en_down_pool(&down_pool,peer,
-                                                 chunk_queue,
-                                                 get_Pkt_Queue)) == NULL) {
-                        // downloading connection pool is full!
-                        fprintf(stderr, "downloading conn pool is full!\n");
-                    } else {
-                        // send out first GET packets 
-                        packet_sender((data_packet_t*)(down_conn->get_queue->head->data),(struct sockaddr*) &from);
-                    }
-                }
-                break;
-            }
-            case PKT_GET: {
+            case INDEXGET_SHORTLIST: {
                 up_conn = get_up_conn(&up_pool,peer);
                 if(up_conn == NULL) {
                     // new connetion
@@ -170,8 +116,57 @@ void process_inbound_udp(int sock) {
                 break;
             }
 
+            case INDEXGET_LONGLIST: {
+                up_conn = get_up_conn(&up_pool,peer);
+                if(up_conn == NULL) {
+                    // new connetion
+                    if(up_pool.num >= 10) {
+                        // sending pool full,construct denied pkt
+                        data_packet_t* denied_pkt = DENIED_maker();
+                        // send denied pkt
+                        packet_sender(denied_pkt,(struct sockaddr*) &from);
+                    } else {
+                        // get data pkt array
+                        data_packet_t** data_pkt_array = DATA_pkt_array_maker((data_packet_t*)buf);
+                        // create a new uploading connection 
+                        up_conn = en_up_pool(&up_pool,peer,data_pkt_array);
+                        if( up_conn != NULL) {
+                            // send first data
+                            up_conn_recur_send(up_conn, (struct sockaddr*) &from);
+                        }
+                    }
+                } else {
+                    fprintf(stderr, "update!\n");
+                }
+                break;
+            }
+
+            case INDEXGET_REGEX: {
+                up_conn = get_up_conn(&up_pool,peer);
+                if(up_conn == NULL) {
+                    // new connetion
+                    if(up_pool.num >= 10) {
+                        // sending pool full,construct denied pkt
+                        data_packet_t* denied_pkt = DENIED_maker();
+                        // send denied pkt
+                        packet_sender(denied_pkt,(struct sockaddr*) &from);
+                    } else {
+                        // get data pkt array
+                        data_packet_t** data_pkt_array = DATA_pkt_array_maker((data_packet_t*)buf);
+                        // create a new uploading connection 
+                        up_conn = en_up_pool(&up_pool,peer,data_pkt_array);
+                        if( up_conn != NULL) {
+                            // send first data
+                            up_conn_recur_send(up_conn, (struct sockaddr*) &from);
+                        }
+                    }
+                } else {
+                    fprintf(stderr, "update!\n");
+                }
+                break;
+            }
             case PKT_DATA: {
-                if(VERBOSE)
+                if(DEFAULT)
                     fprintf(stderr, "receive data pkt,seq%d\n",
                                         ((data_packet_t*)buf)->header.seq_num);
                 down_conn = get_down_conn(&down_pool,peer);
@@ -228,7 +223,7 @@ void process_inbound_udp(int sock) {
 
                 } else {
                     // wrong data packet!!!
-                    if(VERBOSE)
+                    if(DEFAULT)
                         fprintf(stderr, "got invalid data pkt\n");
                     // Construct ACK pkt
                     data_packet_t* ack_pkt = ACK_maker(down_conn->next_pkt,
@@ -240,7 +235,7 @@ void process_inbound_udp(int sock) {
                 break;
             }
             case PKT_ACK: {
-                if(VERBOSE)
+                if(DEFAULT)
                     fprintf(stderr, "recieve ACK:%d!\n",
                                      ((data_packet_t*)buf)->header.ack_num );
                 // continue send data pkt if not finished
@@ -253,7 +248,7 @@ void process_inbound_udp(int sock) {
                     // valid ack
                     up_conn->duplicate = 1;
                     up_conn->l_ack = ((data_packet_t*)buf)->header.ack_num;
-                    if(VERBOSE)
+                    if(DEFAULT)
                         fprintf(stderr, "%dACKed!\n",up_conn->l_ack);
                     if( up_conn->cwnd < up_conn->ssthresh+0.0) {
                         // slow start state
@@ -272,7 +267,7 @@ void process_inbound_udp(int sock) {
                     }
                 } else if( up_conn->l_ack == ((data_packet_t*)buf)->header.ack_num) {
                     // duplicate ack
-                    if (VERBOSE)
+                    if (DEFAULT)
                         fprintf(stderr, "got duplicate!:%d\n",up_conn->duplicate+1 );
                     up_conn->duplicate++;
                     if(up_conn->duplicate >= 3) {
@@ -388,7 +383,7 @@ void peer_run() {
         tv.tv_sec = 10; /* Wait up to 10 seconds. */
         tv.tv_usec = 0;
 
-        if (VERBOSE)
+        if (DEFAULT)
             fprintf(stderr, "New Select with%ld, %d\n", tv.tv_sec, tv.tv_usec);
 
         nfds = select(sock+1, &readfds, NULL, NULL, &tv);
@@ -402,19 +397,19 @@ void peer_run() {
             }
         } else {
             //timeout and try to reflood
-            if (VERBOSE)
+            if (DEFAULT)
                 fprintf(stderr, "Select timed out!!\n");
             if (is_job_finished())
                 continue;  // no job pending
             else {
-                if (VERBOSE)
+                if (DEFAULT)
                     fprintf(stderr, "About to check living\n");
                 check_living();
 
                 if (!is_job_finished())
                     flood_WhoHas();
 
-                if (VERBOSE)
+                if (DEFAULT)
                     fprintf(stderr, "Finish check living\n" );
             }
         }
@@ -461,10 +456,10 @@ void check_living() {
         if (down_pool.flag[i] == 0) continue; // unused conn slot
         down_conn = down_pool.connection[i];
         last_time = &(down_conn->last_time);
-        if (VERBOSE)
+        if (DEFAULT)
             fprintf(stderr, "About to check time diff!!\n");
         if (get_time_diff(last_time) > 10000) { // 10 sec = 10000 ms
-            if (VERBOSE)
+            if (DEFAULT)
                 fprintf(stderr, "Down conn timed out:%d\n", 
                                                down_conn->provider->id);
             chunk_t* chk_ptr;
