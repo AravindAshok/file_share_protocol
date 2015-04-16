@@ -99,10 +99,10 @@ void print_md5_hash(uint8_t *hash){
 int is_chunk_finished(chunk_t* chunk) {
     int cur_size = chunk->cur_size;
     float kb = cur_size / 1024;
-    if (DEFAULT)
+    if (VERBOSE)
         fprintf(stderr, "check finished!!!\n");
     if (cur_size != CHUNK_SIZE) {
-        if (DEFAULT)
+        if (VERBOSE)
             fprintf(stderr, "Not finished yet, cur_size = %.5f\n", kb);
 
         return 0;
@@ -176,7 +176,7 @@ queue_t* GET_maker(peer_t* provider, queue_t* chunk_queue) {
 void packet_sender(data_packet_t* pkt, struct sockaddr* to) {
     int pkt_size = pkt->header.packet_len;
     int type = pkt->header.packet_type;
-    if (DEFAULT)
+    if (VERBOSE)
         fprintf(stderr, "send %s pkt!*********\n", type2str[type]);
     print_pkt(pkt);
     hostToNet(pkt);
@@ -213,7 +213,7 @@ data_packet_t *generate_packet(){
 }
 
 void print_pkt(data_packet_t* pkt) {
-    if (DEFAULT != 1)
+    if (VERBOSE != 1)
         return;
     header_t* hdr = &pkt->header;
     uint8_t* hash;
@@ -242,10 +242,10 @@ void print_pkt(data_packet_t* pkt) {
 int download_done(chunk_t* chunk){
     int cur_size = chunk->cur_size;
     float kb = cur_size / 1024;
-    if (DEFAULT)
+    if (VERBOSE)
         fprintf(stderr, "check finished!!!\n");
     if (cur_size != CHUNK_SIZE) {
-        if (DEFAULT)
+        if (VERBOSE)
             fprintf(stderr, "Not finished yet, cur_size = %.5f\n", kb);
 
         return 0;
