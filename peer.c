@@ -103,7 +103,7 @@ void process_tcp(int sock) {
                     } else {
                         // get data pkt array
                         data_packet_t** data_pkt_array = DATA_pkt_array_maker((data_packet_t*)buf);
-                        // create a new uploading connection 
+                        // create a new uploading connection
                         up_conn = en_up_pool(&up_pool,peer,data_pkt_array);
                         if( up_conn != NULL) {
                             // send first data
@@ -119,7 +119,7 @@ void process_tcp(int sock) {
             case INDEXGET_LONGLIST: {
                 up_conn = get_up_conn(&up_pool,peer);
                 if(up_conn == NULL) {
-                    // new connetion
+                    // new connection
                     if(up_pool.num >= 10) {
                         // sending pool full,construct denied pkt
                         data_packet_t* denied_pkt = DENIED_maker();
@@ -128,7 +128,7 @@ void process_tcp(int sock) {
                     } else {
                         // get data pkt array
                         data_packet_t** data_pkt_array = DATA_pkt_array_maker((data_packet_t*)buf);
-                        // create a new uploading connection 
+                        // create a new uploading connection
                         up_conn = en_up_pool(&up_pool,peer,data_pkt_array);
                         if( up_conn != NULL) {
                             // send first data
@@ -153,7 +153,7 @@ void process_tcp(int sock) {
                     } else {
                         // get data pkt array
                         data_packet_t** data_pkt_array = DATA_pkt_array_maker((data_packet_t*)buf);
-                        // create a new uploading connection 
+                        // create a new uploading connection
                         up_conn = en_up_pool(&up_pool,peer,data_pkt_array);
                         if( up_conn != NULL) {
                             // send first data
@@ -170,7 +170,7 @@ void process_tcp(int sock) {
                     fprintf(stderr, "receive data pkt,seq%d\n",
                                         ((data_packet_t*)buf)->header.seq_num);
                 down_conn = get_down_conn(&down_pool,peer);
-                // check ack number 
+                // check ack number
                 if(down_conn->next_pkt == ((data_packet_t*)buf)->header.seq_num) {
                     // store data
                     store_data((chunk_t*)(down_conn->chunks->head->data),
@@ -184,19 +184,19 @@ void process_tcp(int sock) {
 
                     if (1 == (finished = is_chunk_finished((chunk_t*)(down_conn->chunks->head->data)))) {
 
-                        
+
                         fprintf(stderr, "finished!\n");
                         job.num_need--;
                         ptr = dequeue(down_conn->get_queue); // to do free
                         //free(ptr);
                         dequeue(down_conn->chunks); // to do free
 
-     
+
                         if(down_conn->get_queue->head != NULL) {
                             fprintf(stderr, "send next get!\n");
                             // update down_conn
                             update_down_conn(down_conn,peer);
-                            // send out next GET packets 
+                            // send out next GET packets
                             packet_sender((data_packet_t*)down_conn->get_queue->head->data,(struct sockaddr*) &from);
                         } else if( down_conn->get_queue->head == NULL) {
                             // remove this download connection
@@ -259,10 +259,10 @@ void process_tcp(int sock) {
                         // congestion avoidence state
                         int old_cwnd = up_conn->cwnd;
                         up_conn->cwnd += 1/up_conn->cwnd;
-                        
+
                         if((int)old_cwnd + 1 == (int)up_conn->cwnd )
                             print_cwnd(up_conn);
-                            
+
                         up_conn_recur_send(up_conn,(struct sockaddr*) &from);
                     }
                 } else if( up_conn->l_ack == ((data_packet_t*)buf)->header.ack_num) {
@@ -283,7 +283,7 @@ void process_tcp(int sock) {
                 }
                 break;
             }
-            
+
             case PKT_DENIED: {
                 break;
             }
@@ -292,7 +292,7 @@ void process_tcp(int sock) {
                 // Invalid packet
                 fprintf(stderr,"Invalid Packet:%d!\n", packet_type);
                 break;
-            }   
+            }
         }
 
         check_living();
@@ -314,10 +314,10 @@ void process_get(char *chunkfile, char *outputfile) {
         send_WhoHas(cur_pkt);
         packet_free(cur_pkt);
     }
-    
+
     /* free current job content */
     //freeJob(job);
-    
+
 }
 
 void handle_user_input(char *line, void *cbdata) {
@@ -342,7 +342,7 @@ void peer_run() {
     int yes = 1;
     struct timeval tv;
 
-    
+
 
 
     if ((userbuf = create_userbuf()) == NULL) {
@@ -379,7 +379,7 @@ void peer_run() {
         FD_ZERO(&readfds);
         FD_SET(STDIN_FILENO, &readfds);
         FD_SET(sock, &readfds);
-        
+
         tv.tv_sec = 10; /* Wait up to 10 seconds. */
         tv.tv_usec = 0;
 
@@ -425,13 +425,13 @@ void init_hasChunk(char* has_chunk_file) {
     FILE* file = fopen(has_chunk_file,"r");
     char read_buffer[BUF_SIZE];
     char hash_buffer[MD5_HASH_SIZE*2];
-    
+
     hasChunk = queue_init();
-    
+
     while (fgets(read_buffer,BUF_SIZE,file)) {
         chunk_t* chunk = calloc(sizeof(chunk_t),0);
         sscanf(read_buffer,"%d %s",&(chunk->id),hash_buffer);
-        
+
         /* convert ascii to binary hash code */
         hex2binary(hash_buffer,SHA1_HASH_SIZE*2,chunk->hash);
         //fprintf(stderr, "ID: %d\n", chunk->id);
@@ -440,8 +440,8 @@ void init_hasChunk(char* has_chunk_file) {
 
         memset(read_buffer,0,BUF_SIZE);
         memset(hash_buffer,0,SHA1_HASH_SIZE*2);
-    } 
-    fclose(file);  
+    }
+    fclose(file);
 
 }
 
@@ -460,18 +460,18 @@ void check_living() {
             fprintf(stderr, "About to check time diff!!\n");
         if (get_time_diff(last_time) > 10000) { // 10 sec = 10000 ms
             if (DEFAULT)
-                fprintf(stderr, "Down conn timed out:%d\n", 
+                fprintf(stderr, "Down conn timed out:%d\n",
                                                down_conn->provider->id);
             chunk_t* chk_ptr;
             while ((chk_ptr = (chunk_t*)dequeue(down_conn->chunks)) != NULL) {
-                
+
                 chk_ptr->pvd = NULL; // this chunk's pvd is dead
                 chk_ptr->cur_size = 0;
                 chk_ptr->num_p = 0;
                 job.num_living &= (~(1 << chk_ptr->id)); // this chunk is dead
                 reflood_flag = 1; // need reflood
             }
-            de_down_pool(&down_pool, down_conn->provider);           
+            de_down_pool(&down_pool, down_conn->provider);
             // to do, this conn is timed out
             // reflood whohas to the associated chunk(s)
         }
