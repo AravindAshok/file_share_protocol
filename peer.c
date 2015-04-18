@@ -453,7 +453,7 @@ void check_living() {
     struct timeval* last_time;
     int i, reflood_flag = 0;
     for (i = 0; i < config.max_conn; i++) {
-        if (down_pool.flag[i] == 0) continue; // unused conn slot
+        if (down_pool.flag[i] == 0) continue; // unused connection slot
         down_conn = down_pool.connection[i];
         last_time = &(down_conn->last_time);
         if (DEFAULT)
