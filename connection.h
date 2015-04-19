@@ -43,24 +43,26 @@ typedef struct upload_pool {
 	int num;	
 }up_pool_t;
 
-void init_down_pool(down_pool_t* pool);
-void init_up_pool(up_pool_t* pool);
-void init_down_conn(down_conn_t** conn, bt_peer_t* provider, 
-	queue_t* chunk, queue_t* get_queue);
-void init_up_conn(up_conn_t** conn, bt_peer_t* receiver,  
-	data_packet_t** pkt_array);
-down_conn_t* en_down_pool(down_pool_t* pool,bt_peer_t* provider, 
-	queue_t* chunk, queue_t* get_queue);
-up_conn_t* en_up_pool(up_pool_t* pool,bt_peer_t* receiver,  
-	data_packet_t** pkt_array);
-void de_down_pool(down_pool_t* pool,bt_peer_t* peer);
-void de_up_pool(up_pool_t* pool,bt_peer_t* peer);
-down_conn_t* get_down_conn(down_pool_t* pool, bt_peer_t* peer);
-up_conn_t* get_up_conn(up_pool_t* pool, bt_peer_t* peer);
+//Initialization handlers
+void init_download_pool(download_pool_t* pool);
+void init_upload_pool(upload_pool_t* pool);
+void init_download_connection(download_connection_t** conn, peer_t* provider, queue_t* chunk, queue_t* get_queue);
+void init_upload_connection(upload_connection_t** conn, bt_peer_t* receiver, data_packet_t** pkt_array);
+
+//Adding the respective connections to the pool
+download_connection_t* add_download_pool(download_pool_t* pool, peer_t* provider, queue_t* chunk, queue_t* get_queue);
+upload_connection_t* add_upload_pool(upload_pool_t* pool, peer_t* receiver, data_packet_t** pkt_array);
+
+//Deleting pools
+void delete_download_pool(download_pool_t* pool, peer_t* peer);
+void delete_upload_pool(upload_pool_t* pool, peer_t* peer);
+
+//Get the pointers to get download connection
+download_connection_t* get_download_connection(download_pool_t* pool, peer_t* peer);
+upload_connection_t* get_update_connection(upload_pool_t* pool, peer_t* peer);
 void up_conn_recur_send(up_conn_t* conn, struct sockaddr* to);
-void update_down_conn( down_conn_t* conn, bt_peer_t* peer);
-void update_up_conn(up_conn_t* conn, bt_peer_t* peer, data_packet_t* get_pkt);
-void print_cwnd(up_conn_t *conn);
+void update_download_connection( down_conn_t* conn, bt_peer_t* peer);
+void update_upload_connection(upload_connection_t* conn, peer_t* peer, data_packet_t* get_pkt);
 
 #endif
 
