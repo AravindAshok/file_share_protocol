@@ -31,7 +31,7 @@ void check_living();
 
 /* Global variables */
 job_t job;
-bt_config_t config;
+config_t config;
 queue_t* hasChunk;
 up_pool_t up_pool;
 down_pool_t down_pool;
@@ -41,7 +41,7 @@ uint32_t some_short = 20;
 
 int main(int argc, char **argv) {
 
-    bt_init(&config, argc, argv);
+    init(&config, argc, argv);
 
     DPRINTF(DEBUG_INIT, "peer.c main beginning\n");
 
@@ -51,11 +51,11 @@ int main(int argc, char **argv) {
     strcpy(config.has_chunk_file, "haschunks");
 #endif
 
-    bt_parse_command_line(&config);
+    parse_command_line(&config);
 
 #ifdef DEBUG
     if (debug & DEBUG_INIT) {
-        bt_dump_config(&config);
+        dump_config(&config);
     }
 #endif
 
@@ -84,7 +84,7 @@ void process_tcp(int sock) {
         // call packet_parser
         packet_type = packet_parser(buf);
         //get peer
-        bt_peer_t* peer = bt_peer_get(&config,(struct sockaddr *)&from);
+        peer_t* peer = peer_get(&config,(struct sockaddr *)&from);
         //print_pkt((data_packet_t*)buf);
         // switch on packet type
         switch(packet_type) {
