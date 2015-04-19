@@ -43,11 +43,12 @@ typedef struct chunk_s {
 	int id;
 	uint8_t hash[MD5_HASH_SIZE];
 	char *data;
-    int cur_size;
+    	int cur_size;
 	int num_p;
-	bt_peer_t *pvd; /* providers */
+	peer_t *pvd; /* providers */
 } chunk_t;
  
+/* chunk_size = 512 * 1024 */
 // num_chunk * 512 * 1024 = file_size;max num_chunk = 4095
 // largest file supports is 2GB - 512KB
 
@@ -61,7 +62,8 @@ typedef struct job_s {
     char get_chunk_file[BT_FILENAME_LEN];
 } job_t;
 
-typedef struct header_s {
+
+typedef struct header {
     short magicnum;
     char version;
     char packet_type;

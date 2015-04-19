@@ -12,7 +12,7 @@
 #define INIT_CWND     8   // initial window size   
 #define INIT_SSTHRESH 64  // initial thresh size
 
-typedef struct down_conn_s {
+typedef struct download_connection {
 	bt_peer_t* provider;
 	queue_t* chunks;
 	queue_t* get_queue;
@@ -21,7 +21,7 @@ typedef struct down_conn_s {
 }down_conn_t;
 
 
-typedef struct up_conn_s {
+typedef struct upload_connection {
 	bt_peer_t* receiver;
 	data_packet_t** pkt_array;
 	int l_ack;
@@ -31,13 +31,13 @@ typedef struct up_conn_s {
 	int ssthresh;
 }up_conn_t;
 
-typedef struct down_pool_s {
+typedef struct download_pool {
 	down_conn_t** connection;
 	int* flag;
 	int num;
 }down_pool_t;
 
-typedef struct up_pool_s {
+typedef struct upload_pool {
 	up_conn_t** connection;
 	int* flag;
 	int num;	
