@@ -8,9 +8,8 @@
 ***************************************************************************/
 
 #include "connection.h"
-#include 
-void init_upload_connection(up_connection_t** connection, bt_peer_t* receiver,  
-	data_packet_t** pkt_array) {
+#include "parse.h"
+void init_upload_connection(up_connection_t** connection, peer_t* receiver, data_packet_t** pkt_array) {
 	(*connection) = (up_connection_t*)malloc(sizeof(up_connection_t));
 	(*connection)->receiver = receiver;
 	(*connection)->pkt_array = pkt_array;
@@ -21,14 +20,13 @@ void init_upload_connection(up_connection_t** connection, bt_peer_t* receiver,
 	(*connection)->ssthresh = INIT_SSTHRESH;
 }
 
-void init_download_connection(down_connection_t** connection, bt_peer_t* provider, 
-	queue_t* chunk, queue_t* get_queue) {
+void init_download_connection(down_connection_t** connection, bt_peer_t* provider, queue_t* chunk, queue_t* get_queue) {
 	(*connection) = (down_connection_t*)malloc(sizeof(down_connection_t));
 	(*connection)->provider = provider;
 	(*connection)->chunks = chunk;
 	(*connection)->get_queue = get_queue;
 	(*connection)->next_pkt = 1;
-	gettimeofday(&((*connection)->last_time), NULL); // initial time
+	gettimeofday(&((*connection)->last_time), NULL); // initial timestamp
 }
 
 void init_down_pool(down_pool_t* pool) {
@@ -53,5 +51,4 @@ void init_up_pool(up_pool_t* pool) {
 	while(i < max) {
 		flags[i++] = 0;
 	}
-	//fprintf(stderr, "%f\n", job.cwnd);
 }
