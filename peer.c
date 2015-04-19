@@ -397,6 +397,7 @@ f
     //freeJob(job);
 
 }
+/******* Note: This is the main underlying sockets part of this protocol *********/
 
 void peer_run() {
     int sock;
@@ -406,13 +407,8 @@ void peer_run() {
     int yes = 1;
     struct timeval tv;
 
-    if ((userbuf = create_userbuf()) == NULL) {
-        perror("peer_run could not allocate userbuf");
-        exit(-1);
-    }
-
     if ((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP)) == -1) {
-        perror("peer_run could not create socket");
+        perror("peer could not create socket");
         exit(-1);
     }
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
