@@ -179,27 +179,51 @@ data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt) {
 
 
 void cat_chunks() {
-    FILE* fdout;
+    FILE* file_out;
     int i;
     int num_chk = job.num_chunk;
     chunk_t *chk_arr = job.chunks;
 
     assert(job.num_need == 0);
 
-
-    fdout = fopen(config.output_file, "w");
+    file_out = fopen(config.output_file, "w");
     for (i = 0; i < num_chk; i++) {
         fwrite(chk_arr[i].data,1,CHUNK_SIZE,fdout);
     }
     fprintf(stderr, "cat finished!!!\n");
-    fclose(fdout);
+    fclose(file_out);
 }
 
+int is_chunk_finished(chunk_t* chunk) {
+    int cur_size = chunk->cur_size;
+    float kb = cur_size / 1024;
+    if (DEFAULT)
+        fprintf(stderr, "check finished!!!\n");
+    if (cur_size != CHUNK_SIZE) {
+        if (DEFAULT)
+            fprintf(stderr, "Not finished yet, cur_size = %.5f\n", kb);
 
-void store_data(){
+        return 0;
+    }
+    uint8_t hash[SHA1_HASH_SIZE];
+    // get hash code
+    shahash((uint8_t*)chunk->data,cur_size,hash);
+    // check hash code
 
+    if( memcmp(hash,chunk->hash,SHA1_HASH_SIZE) == 0) {
+        return 1;
+    } else {
+        return -1;
 
+    }
 }
+
+void store_data(chunk_t* chunk, data_packet_t* pkt) {
+    int size = pkt->header.packet_len - pkt->header.header_len;
+    memcpy(chunk->data+chunk->cur_size,pkt->data,size);
+    chunk->cur_size += size;
+}
+
 
 void pkt2chunk(chunk_t* chunk, data_packet_t* pkt) {
     int size = pkt->header.packet_len - pkt->header.header_len;
