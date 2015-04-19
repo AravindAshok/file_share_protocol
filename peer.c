@@ -477,9 +477,9 @@ void peer_run() {
     }
 }
 
-void init_hasChunk(char* has_chunk_file) {
+void init_hasChunk(char* chunk_file) {
 
-    FILE* file = fopen(has_chunk_file,"r");
+    FILE* file = fopen(chunk_file,"r");
     char read_buffer[BUF_SIZE];
     char hash_buffer[MD5_HASH_SIZE*2];
 
@@ -487,16 +487,17 @@ void init_hasChunk(char* has_chunk_file) {
 
     while (fgets(read_buffer,BUF_SIZE,file)) {
         chunk_t* chunk = calloc(sizeof(chunk_t),0);
-        sscanf(read_buffer,"%d %s",&(chunk->id),hash_buffer);
+        sscanf(read_buffer,"%d %s",&(chunk->id),hash_buffer); /****************Small doubt here ************/
 
         /* convert ascii to binary hash code */
-        hex2binary(hash_buffer,SHA1_HASH_SIZE*2,chunk->hash);
+        hex2binary(hash_buffer,MD5_HASH_SIZE*2,chunk->hash);
         //fprintf(stderr, "ID: %d\n", chunk->id);
         //print_hash((uint8_t *)chunk->hash);
         enqueue(hasChunk, (void *)chunk);
 
+	// Resetting the buffer
         memset(read_buffer,0,BUF_SIZE);
-        memset(hash_buffer,0,SHA1_HASH_SIZE*2);
+        memset(hash_buffer,0,MD5_HASH_SIZE*2);
     }
     fclose(file);
 
