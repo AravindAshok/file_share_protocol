@@ -87,10 +87,6 @@ data_packet_t *generate_packet(int type, short pkt_len, u_int seq,
 
 
 
-int process_init(char* file, char* output){
-    FILE*
-}
-
 void print_md5_hash(uint8_t *hash){
 
 }
