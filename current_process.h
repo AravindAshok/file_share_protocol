@@ -24,7 +24,7 @@
 #define HEADERLEN       16
 #define DATALEN         PACKETLEN - HEADERLEN
 #define MAX_CHUNK		74   //Max number of chunk in a single whohas pkt
-#define BUF_SIZE        60
+#define BUF_SIZE                60
 #define INDEXGET_SHORTLIST 	0
 #define INDEXGET_LONGLIST       1
 #define INDEXGET_REGEX		2
