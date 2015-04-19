@@ -1,109 +1,66 @@
-#ifndef _JOB_H
-#define _JOB_H
 
-#include "md5.h"
-#include "parse.h"
+#ifndef _CONN_H
+#define _CONN_H
+
+#include "bt_parse.h"
 #include "queue.h"
 #include "chunk.h"
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h> 
-#include <assert.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
+#include "sha.h"
+#include "job.h"
 #include "timer.h"
 
-#define PACKETLEN       1500
-#define HEADERLEN       16
-#define DATALEN         PACKETLEN - HEADERLEN
-#define MAX_CHUNK		74   //Max number of chunk in a single whohas pkt
-#define BUF_SIZE        60
-#define INDEXGET_SHORTLIST 	0
-#define INDEXGET_LONGLIST       1
-#define INDEXGET_REGEX		2
-#define FILEHASH_VERIFY		3
-#define FILEHASH_CHECKALL	4
-#define FILEDOWNLOAD		5
-#define FILEUPLOAD		6
+#define INIT_CWND     8   // initial window size   
+#define INIT_SSTHRESH 64  // initial thresh size
 
-#define ACK 			7
-#define DENIED			8      
-#define CHUNK_SIZE      	(1 << 19)  //size of a single chunk in Bytes
-#define DEFAULT         	0
+typedef struct down_conn_s {
+	bt_peer_t* provider;
+	queue_t* chunks;
+	queue_t* get_queue;
+	struct timeval last_time;
+	int next_pkt; // next expected pkt number
+}down_conn_t;
 
 
-typedef struct chunk_s {
-	int id;
-	uint8_t hash[MD5_HASH_SIZE];
-	char *data;
-    int cur_size;
-	int num_p;
-	bt_peer_t *pvd; /* providers */
-} chunk_t;
- 
-// num_chunk * 512 * 1024 = file_size;max num_chunk = 4095
-// largest file supports is 2GB - 512KB
+typedef struct up_conn_s {
+	bt_peer_t* receiver;
+	data_packet_t** pkt_array;
+	int l_ack;
+	int l_available;
+	int duplicate;
+	float cwnd;
+	int ssthresh;
+}up_conn_t;
 
+typedef struct down_pool_s {
+	down_conn_t** connection;
+	int* flag;
+	int num;
+}down_pool_t;
 
-typedef struct job_s {
-    int num_chunk;   
-    int num_need;
-    int num_living;
-    chunk_t* chunks;
-    short living_flags;
-    char get_chunk_file[BT_FILENAME_LEN];
-} job_t;
+typedef struct up_pool_s {
+	up_conn_t** connection;
+	int* flag;
+	int num;	
+}up_pool_t;
 
-typedef struct header_s {
-    short magicnum;
-    char version;
-    char packet_type;
-    short header_len;
-    short packet_len; 
-    u_int seq_num;
-    u_int ack_num;
-} header_t;  
-
-typedef struct data_packet {
-    header_t header;
-    char data[DATALEN];
-} data_packet_t;
-
-
-int init_job(char* chunkFile, char* output_file);
-int is_job_finished();
-int IfIHave(uint8_t *hash_start);
-int packet_parser(char* buf);
-void send_WhoHas(data_packet_t* pkt);
-void packet_sender(data_packet_t* pkt, struct sockaddr* to);
-queue_t *WhoHas_maker(void);
-data_packet_t *IHave_maker(data_packet_t *whohas_pkt);
-int match_need(uint8_t *hash);
-queue_t* GET_maker(data_packet_t *pkt,bt_peer_t* peer, queue_t* chunk_queue);
-data_packet_t* ACK_maker(int ack, data_packet_t* pkt);
-data_packet_t* DENIED_maker();
-void whohas_data_maker(int num_chunk, chunk_t *chunks, char* data);
-void flood_WhoHas();
-data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt);
-data_packet_t *packet_maker(int type, short pkg_len, u_int seq, u_int ack, char *data);
-void store_data(chunk_t* chunk, data_packet_t* pkt);
-void cat_chunks();
-int is_chunk_finished(chunk_t* chunk);
-void packet_free(data_packet_t *pkg);
-void local2net(data_packet_t* pkt);
-void net2local(data_packet_t* pkt);
-void print_pkt(data_packet_t* pkt);
-void print_hash(uint8_t *hash);
-void hostToNet(data_packet_t* pkt);
-void netToHost(data_packet_t* pkt);
-void clear_job();
-
+void init_down_pool(down_pool_t* pool);
+void init_up_pool(up_pool_t* pool);
+void init_down_conn(down_conn_t** conn, bt_peer_t* provider, 
+	queue_t* chunk, queue_t* get_queue);
+void init_up_conn(up_conn_t** conn, bt_peer_t* receiver,  
+	data_packet_t** pkt_array);
+down_conn_t* en_down_pool(down_pool_t* pool,bt_peer_t* provider, 
+	queue_t* chunk, queue_t* get_queue);
+up_conn_t* en_up_pool(up_pool_t* pool,bt_peer_t* receiver,  
+	data_packet_t** pkt_array);
+void de_down_pool(down_pool_t* pool,bt_peer_t* peer);
+void de_up_pool(up_pool_t* pool,bt_peer_t* peer);
+down_conn_t* get_down_conn(down_pool_t* pool, bt_peer_t* peer);
+up_conn_t* get_up_conn(up_pool_t* pool, bt_peer_t* peer);
+void up_conn_recur_send(up_conn_t* conn, struct sockaddr* to);
+void update_down_conn( down_conn_t* conn, bt_peer_t* peer);
+void update_up_conn(up_conn_t* conn, bt_peer_t* peer, data_packet_t* get_pkt);
+void print_cwnd(up_conn_t *conn);
 
 #endif
+
