@@ -382,7 +382,7 @@ void process_get(char *chunkfile, char *outputfile) {
             chunkfile, outputfile);
     /* Create a Job */
     init_job(chunkfile,outputfile);
-f
+
     /* call whohasmaker */
     queue_t* whoHasQueue = WhoHas_maker();
     /* send out all whohas packets */
