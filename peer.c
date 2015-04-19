@@ -406,9 +406,6 @@ void peer_run() {
     int yes = 1;
     struct timeval tv;
 
-
-
-
     if ((userbuf = create_userbuf()) == NULL) {
         perror("peer_run could not allocate userbuf");
         exit(-1);
@@ -480,10 +477,6 @@ void peer_run() {
     }
 }
 
-/** @brief Init has chunk struct
- *  @param has_chunk_file the path to haschunk file
- *  @return Void
- */
 void init_hasChunk(char* has_chunk_file) {
 
     FILE* file = fopen(has_chunk_file,"r");
