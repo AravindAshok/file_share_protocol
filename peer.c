@@ -164,207 +164,207 @@ void process_tcp(int sock) {
                                      break;
                                  }
             case FILEHASH_VERIFY_: {
-                             if(DEFAULT)
-                                 fprintf();
-                             up_conn = get_upload_connection(&upload_pool,peer);
-                             if(upload_connection == NULL){
-                                 if(upload_pool < 10){
-                                     data_packet_t* verify_pkt = VERIFY_maker();
-                                     upload_connection = create_up_pool(&up_pool, peer, )// ************************* */;
-                                     if(upload_connection != NULL)
-                                        packet_sender
-                                     // send verify pkt
-                                     packet_sender(verify_pkt, (struct sockaddr*) &from);
-                                 }
+                                       if(DEFAULT)
+                                           fprintf();
+                                       up_conn = get_upload_connection(&upload_pool,peer);
+                                       if(upload_connection == NULL){
+                                           if(upload_pool < 10){
+                                               data_packet_t* verify_pkt = VERIFY_maker();
+                                               upload_connection = create_up_pool(&up_pool, peer, )// ************************* */;
+                                               if(upload_connection != NULL)
+                                                   packet_sender
+                                                       // send verify pkt
+                                                       packet_sender(verify_pkt, (struct sockaddr*) &from);
+                                           }
 
-                                 else{
-                                             // sending pool full,construct denied pkt
-                                             data_packet_t* denied_pkt = DENIED_maker();
-                                             // send denied pkt
-                                             packet_sender(denied_pkt,(struct sockaddr*) &from);
+                                           else{
+                                               // sending pool full,construct denied pkt
+                                               data_packet_t* denied_pkt = DENIED_maker();
+                                               // send denied pkt
+                                               packet_sender(denied_pkt,(struct sockaddr*) &from);
 
-                                 }
-                             }
-
-                         }
-
-
-	    case FILEHASH_CHECKALL: {
-                             if(DEFAULT)
-                                 fprintf();
-                             up_conn = get_upload_connection(&upload_pool,peer);
-                             if(upload_connection == NULL){
-                                 if(upload_pool < 10){
-                                     data_packet_t* verify_pkt = VERIFY_maker();
-                                     upload_connection = create_up_pool(&up_pool, peer, )// ************************* */;
-                                     if(upload_connection != NULL)
-                                        packet_sender
-                                     // send verify pkt
-                                     packet_sender(verify_pkt, (struct sockaddr*) &from);
-                                 }
-
-                                 else{
-                                             // sending pool full,construct denied pkt
-                                             data_packet_t* denied_pkt = DENIED_maker();
-                                             // send denied pkt
-                                             packet_sender(denied_pkt,(struct sockaddr*) &from);
-
-                                 }
-                             }
-
-                         }
-
-            case FILEDOWNLOAD: {
-                up_conn = get_up_conn(&up_pool,peer);
-                if(up_conn == NULL) {
-                    // new connetion
-                    if(up_pool.num >= 10) {
-                        // sending pool full,construct denied pkt
-                        data_packet_t* denied_pkt = DENIED_maker();
-                        // send denied pkt
-                        packet_sender(denied_pkt,(struct sockaddr*) &from);
-                    } else {
-                        // get data pkt array
-                        data_packet_t** data_pkt_array = DATA_pkt_array_maker((data_packet_t*)buf);
-                        // create a new uploading connection 
-                        up_conn = en_up_pool(&up_pool,peer,data_pkt_array);
-                        if( up_conn != NULL) {
-                            // send first data
-                            up_conn_recur_send(up_conn, (struct sockaddr*) &from);
-                        }
-                    }
-                } else {
-                    fprintf(stderr, "update!\n");
-                }
-                break;
-            }
-
-
-            case FILEUPLOAD: {
-                               if(DEFAULT)
-                                   fprintf(stderr, "receive data pkt,seq%d\n",
-                                           ((data_packet_t*)buf)->header.seq_num);
-                               down_conn = get_down_conn(&down_pool,peer);
-                               // check ack number
-                               if(down_conn->next_pkt == ((data_packet_t*)buf)->header.seq_num) {
-                                   // store data
-                                   store_data((chunk_t*)(down_conn->chunks->head->data),
-                                           (data_packet_t*)buf);
-                                   // Construct ACK pkt
-                                   data_packet_t* ack_pkt = ACK_maker(++(down_conn->next_pkt),
-                                           (data_packet_t*)buf);
-                                   // send ACK pkt
-                                   packet_sender(ack_pkt,(struct sockaddr *) &from);
-                                   // check if current chunk downloading finished
-
-                                   if (1 == (finished = is_chunk_finished((chunk_t*)(down_conn->chunks->head->data)))) {
-
-
-                                       fprintf(stderr, "finished!\n");
-                                       job.num_need--;
-                                       ptr = dequeue(down_conn->get_queue); // to do free
-                                       //free(ptr);
-                                       dequeue(down_conn->chunks); // to do free
-
-
-                                       if(down_conn->get_queue->head != NULL) {
-                                           fprintf(stderr, "send next get!\n");
-                                           // update down_conn
-                                           update_down_conn(down_conn,peer);
-                                           // send out next GET packets
-                                           packet_sender((data_packet_t*)down_conn->get_queue->head->data,(struct sockaddr*) &from);
-                                       } else if( down_conn->get_queue->head == NULL) {
-                                           // remove this download connection
-                                           fprintf(stderr, "remove current download connection\n");
-                                           de_down_pool(&down_pool,peer);
-                                       }
-                                       // check current downloading connection finished
-                                       if(job.num_need == 0) {
-                                           fprintf(stderr, "GOT %s\n",job.get_chunk_file);
-                                           // all finished， cat all chunks into one file
-                                           cat_chunks();
-                                           // job finished
-                                           if(is_job_finished()) {
-                                               clear_job();
                                            }
                                        }
 
-                                   } else if (-1 == finished) {
-                                       // hash wrong
-                                       fprintf(stderr, "Hashed wrong, resend last get!\n");
-                                       update_down_conn(down_conn,peer);
-                                       packet_sender((data_packet_t*)down_conn->get_queue->head->data,(struct sockaddr*) &from);
                                    }
 
-                               } else {
-                                   // wrong data packet!!!
-                                   if(DEFAULT)
-                                       fprintf(stderr, "got invalid data pkt\n");
-                                   // Construct ACK pkt
-                                   data_packet_t* ack_pkt = ACK_maker(down_conn->next_pkt,
-                                           (data_packet_t*)buf);
-                                   // send ACK pkt
-                                   packet_sender(ack_pkt,(struct sockaddr *) &from);
+
+            case FILEHASH_CHECKALL: {
+                                        if(DEFAULT)
+                                            fprintf();
+                                        up_conn = get_upload_connection(&upload_pool,peer);
+                                        if(upload_connection == NULL){
+                                            if(upload_pool < 10){
+                                                data_packet_t* verify_pkt = VERIFY_maker();
+                                                upload_connection = create_up_pool(&up_pool, peer, )// ************************* */;
+                                                if(upload_connection != NULL)
+                                                    packet_sender
+                                                        // send verify pkt
+                                                        packet_sender(verify_pkt, (struct sockaddr*) &from);
+                                            }
+
+                                            else{
+                                                // sending pool full,construct denied pkt
+                                                data_packet_t* denied_pkt = DENIED_maker();
+                                                // send denied pkt
+                                                packet_sender(denied_pkt,(struct sockaddr*) &from);
+
+                                            }
+                                        }
+
+                                    }
+
+            case FILEDOWNLOAD: {
+                                   up_conn = get_up_conn(&up_pool,peer);
+                                   if(up_conn == NULL) {
+                                       // new connetion
+                                       if(up_pool.num >= 10) {
+                                           // sending pool full,construct denied pkt
+                                           data_packet_t* denied_pkt = DENIED_maker();
+                                           // send denied pkt
+                                           packet_sender(denied_pkt,(struct sockaddr*) &from);
+                                       } else {
+                                           // get data pkt array
+                                           data_packet_t** data_pkt_array = DATA_pkt_array_maker((data_packet_t*)buf);
+                                           // create a new uploading connection
+                                           up_conn = en_up_pool(&up_pool,peer,data_pkt_array);
+                                           if( up_conn != NULL) {
+                                               // send first data
+                                               up_conn_recur_send(up_conn, (struct sockaddr*) &from);
+                                           }
+                                       }
+                                   } else {
+                                       fprintf(stderr, "update!\n");
+                                   }
+                                   break;
                                }
-                               gettimeofday(&(down_conn->last_time), NULL);  // update last alive time
-                               break;
-                           }
+
+
+            case FILEUPLOAD: {
+                                 if(DEFAULT)
+                                     fprintf(stderr, "receive data pkt,seq%d\n",
+                                             ((data_packet_t*)buf)->header.seq_num);
+                                 down_conn = get_down_conn(&down_pool,peer);
+                                 // check ack number
+                                 if(down_conn->next_pkt == ((data_packet_t*)buf)->header.seq_num) {
+                                     // store data
+                                     store_data((chunk_t*)(down_conn->chunks->head->data),
+                                             (data_packet_t*)buf);
+                                     // Construct ACK pkt
+                                     data_packet_t* ack_pkt = ACK_maker(++(down_conn->next_pkt),
+                                             (data_packet_t*)buf);
+                                     // send ACK pkt
+                                     packet_sender(ack_pkt,(struct sockaddr *) &from);
+                                     // check if current chunk downloading finished
+
+                                     if (1 == (finished = is_chunk_finished((chunk_t*)(down_conn->chunks->head->data)))) {
+
+
+                                         fprintf(stderr, "finished!\n");
+                                         job.num_need--;
+                                         ptr = dequeue(down_conn->get_queue); // to do free
+                                         //free(ptr);
+                                         dequeue(down_conn->chunks); // to do free
+
+
+                                         if(down_conn->get_queue->head != NULL) {
+                                             fprintf(stderr, "send next get!\n");
+                                             // update down_conn
+                                             update_down_conn(down_conn,peer);
+                                             // send out next GET packets
+                                             packet_sender((data_packet_t*)down_conn->get_queue->head->data,(struct sockaddr*) &from);
+                                         } else if( down_conn->get_queue->head == NULL) {
+                                             // remove this download connection
+                                             fprintf(stderr, "remove current download connection\n");
+                                             de_down_pool(&down_pool,peer);
+                                         }
+                                         // check current downloading connection finished
+                                         if(job.num_need == 0) {
+                                             fprintf(stderr, "GOT %s\n",job.get_chunk_file);
+                                             // all finished， cat all chunks into one file
+                                             cat_chunks();
+                                             // job finished
+                                             if(is_job_finished()) {
+                                                 clear_job();
+                                             }
+                                         }
+
+                                     } else if (-1 == finished) {
+                                         // hash wrong
+                                         fprintf(stderr, "Hashed wrong, resend last get!\n");
+                                         update_down_conn(down_conn,peer);
+                                         packet_sender((data_packet_t*)down_conn->get_queue->head->data,(struct sockaddr*) &from);
+                                     }
+
+                                 } else {
+                                     // wrong data packet!!!
+                                     if(DEFAULT)
+                                         fprintf(stderr, "got invalid data pkt\n");
+                                     // Construct ACK pkt
+                                     data_packet_t* ack_pkt = ACK_maker(down_conn->next_pkt,
+                                             (data_packet_t*)buf);
+                                     // send ACK pkt
+                                     packet_sender(ack_pkt,(struct sockaddr *) &from);
+                                 }
+                                 gettimeofday(&(down_conn->last_time), NULL);  // update last alive time
+                                 break;
+                             }
 
 
             case FILE_UPLOAD_ALLOW: {
-                              if(DEFAULT)
-                                  fprintf(stderr, "recieved ALLOW response. ALLOW response number is %d\n", ((data_packet_t*)buf)->header.ack_num);
-                              // continue send data pkt if not finished
-                              upload_conn = get_upload_conn(&up_pool,peer);
-                              // check ACK
-                              if( ((data_packet_t*)buf)->header.ack_num == 512) {
-                                  // downloading finished
-                                  delete_upload_pool(&upload_pool,peer);
-                              }
+                                        if(DEFAULT)
+                                            fprintf(stderr, "recieved ALLOW response. ALLOW response number is %d\n", ((data_packet_t*)buf)->header.ack_num);
+                                        // continue send data pkt if not finished
+                                        upload_conn = get_upload_conn(&up_pool,peer);
+                                        // check ACK
+                                        if( ((data_packet_t*)buf)->header.ack_num == 512) {
+                                            // downloading finished
+                                            delete_upload_pool(&upload_pool,peer);
+                                        }
 
-                              else if (up_conn->l_ack+1 <= ((data_packet_t*)buf)->header.ack_num) {
-                                  // valid ack
-                                  up_conn->duplicate = 1;
-                                  up_conn->l_ack = ((data_packet_t*)buf)->header.ack_num;
-                                  if(DEFAULT)
-                                      fprintf(stderr, "%dACKed!\n",up_conn->l_ack);
-                                  if( up_conn->cwnd < up_conn->ssthresh+0.0) {
-                                      // slow start state
-                                      up_conn->cwnd += 1;
-                                      print_cwnd(up_conn);
-                                      up_conn_recur_send(up_conn,(struct sockaddr*) &from);
-                                  } else {
-                                      // congestion avoidence state
-                                      int old_cwnd = up_conn->cwnd;
-                                      up_conn->cwnd += 1/up_conn->cwnd;
+                                        else if (up_conn->l_ack+1 <= ((data_packet_t*)buf)->header.ack_num) {
+                                            // valid ack
+                                            up_conn->duplicate = 1;
+                                            up_conn->l_ack = ((data_packet_t*)buf)->header.ack_num;
+                                            if(DEFAULT)
+                                                fprintf(stderr, "%dACKed!\n",up_conn->l_ack);
+                                            if( up_conn->cwnd < up_conn->ssthresh+0.0) {
+                                                // slow start state
+                                                up_conn->cwnd += 1;
+                                                print_cwnd(up_conn);
+                                                up_conn_recur_send(up_conn,(struct sockaddr*) &from);
+                                            } else {
+                                                // congestion avoidence state
+                                                int old_cwnd = up_conn->cwnd;
+                                                up_conn->cwnd += 1/up_conn->cwnd;
 
-                                      if((int)old_cwnd + 1 == (int)up_conn->cwnd )
-                                          print_cwnd(up_conn);
+                                                if((int)old_cwnd + 1 == (int)up_conn->cwnd )
+                                                    print_cwnd(up_conn);
 
-                                      up_conn_recur_send(up_conn,(struct sockaddr*) &from);
-                                  }
-                              } else if( up_conn->l_ack == ((data_packet_t*)buf)->header.ack_num) {
-                                  // duplicate ack
-                                  if (DEFAULT)
-                                      fprintf(stderr, "got duplicate!:%d\n",up_conn->duplicate+1 );
-                                  up_conn->duplicate++;
-                                  if(up_conn->duplicate >= 3) {
-                                      up_conn->ssthresh = up_conn->cwnd/2>2?up_conn->cwnd/2:2;
-                                      int old_cwnd = up_conn->cwnd;
-                                      up_conn->cwnd = 1;
-                                      up_conn->l_available = up_conn->l_ack+1;
-                                      up_conn_recur_send(up_conn,(struct sockaddr*) &from);
-                                      up_conn->duplicate = 0;
-                                      if ((int)old_cwnd != up_conn->cwnd)
-                                          print_cwnd(up_conn);
-                                  }
-                              }
-                              break;
-                          }
+                                                up_conn_recur_send(up_conn,(struct sockaddr*) &from);
+                                            }
+                                        } else if( up_conn->l_ack == ((data_packet_t*)buf)->header.ack_num) {
+                                            // duplicate ack
+                                            if (DEFAULT)
+                                                fprintf(stderr, "got duplicate!:%d\n",up_conn->duplicate+1 );
+                                            up_conn->duplicate++;
+                                            if(up_conn->duplicate >= 3) {
+                                                up_conn->ssthresh = up_conn->cwnd/2>2?up_conn->cwnd/2:2;
+                                                int old_cwnd = up_conn->cwnd;
+                                                up_conn->cwnd = 1;
+                                                up_conn->l_available = up_conn->l_ack+1;
+                                                up_conn_recur_send(up_conn,(struct sockaddr*) &from);
+                                                up_conn->duplicate = 0;
+                                                if ((int)old_cwnd != up_conn->cwnd)
+                                                    print_cwnd(up_conn);
+                                            }
+                                        }
+                                        break;
+                                    }
 
             case FILE_UPLOAD_DENY: {
-                                 break;
-                             }
+                                       break;
+                                   }
 
             default: {
                          // Label the packet as an invalid packet
@@ -523,38 +523,5 @@ void init_hasChunk(char* has_chunk_file) {
 
 }
 
-/** @brief Check if any conn is dead
- *  @return Void
- */
-void check_connection() {
-    down_conn_t* down_conn;
-    struct timeval* last_time;
-    int i, reflood_flag = 0;
-    for (i = 0; i < config.max_conn; i++) {
-        if (down_pool.flag[i] == 0) continue; // unused connection slot
-        down_conn = down_pool.connection[i];
-        last_time = &(down_conn->last_time);
-        if (DEFAULT)
-            fprintf(stderr, "About to check time diff!!\n");
-        if (get_time_diff(last_time) > 10000) { // 10 sec = 10000 ms
-            if (DEFAULT)
-                fprintf(stderr, "Down conn timed out:%d\n",
-                        down_conn->provider->id);
-            chunk_t* chk_ptr;
-            while ((chk_ptr = (chunk_t*)dequeue(down_conn->chunks)) != NULL) {
-
-                chk_ptr->pvd = NULL; // this chunk's pvd is dead
-                chk_ptr->cur_size = 0;
-                chk_ptr->num_p = 0;
-                job.num_living &= (~(1 << chk_ptr->id)); // this chunk is dead
-                reflood_flag = 1; // need reflood
-            }
-            de_down_pool(&down_pool, down_conn->provider);
-            // to do, this conn is timed out
-            // reflood whohas to the associated chunk(s)
-        }
-    }
-
-    if (reflood_flag)
-        flood_WhoHas();
+void connection_check(){
 }
