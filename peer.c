@@ -414,6 +414,8 @@ If you use it, and if the socket type is SOCK_STREAM and the family is AF_INET, 
         perror("peer could not create socket");
         exit(-1);
     }
+
+// Removing insane errors like "address already in use"
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     fcntl(sock, F_SETFL, O_NONBLOCK);
     bzero(&myaddr, sizeof(myaddr));
