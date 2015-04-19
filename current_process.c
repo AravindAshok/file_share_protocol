@@ -96,30 +96,6 @@ void print_md5_hash(uint8_t *hash){
 }
 
 
-int is_chunk_finished(chunk_t* chunk) {
-    int cur_size = chunk->cur_size;
-    float kb = cur_size / 1024;
-    if (DEFAULT)
-        fprintf(stderr, "check finished!!!\n");
-    if (cur_size != CHUNK_SIZE) {
-        if (DEFAULT)
-            fprintf(stderr, "Not finished yet, cur_size = %.5f\n", kb);
-
-        return 0;
-    }
-    uint8_t hash[MD5_HASH_SIZE];
-    // get hash code
-    md5hash((uint8_t*)chunk->data,cur_size,hash);
-    // check hash code
-
-    if( memcmp(hash,chunk->hash,SHA1_HASH_SIZE) == 0) {
-        return 1;
-    } else {
-        return -1;
-
-    }
-}
-
 data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt) {
     data_packet_t** data_pkt_array = (data_packet_t**)calloc(sizeof(data_packet_t*),512);
     int index = 0, i = 0;
@@ -334,7 +310,7 @@ void print_pkt(data_packet_t* pkt) {
     fprintf(stderr, "*************END*************\n");
 }
 
-int download_done(chunk_t* chunk){
+int chunk_download_done(chunk_t* chunk){
     int cur_size = chunk->cur_size;
     float kb = cur_size / 1024;
     if (DEFAULT)
@@ -345,15 +321,15 @@ int download_done(chunk_t* chunk){
 
         return 0;
     }
-    uint8_t hash[SHA1_HASH_SIZE];
+    uint8_t hash[MD5_HASH_SIZE];
     // get hash code
-    shahash((uint8_t*)chunk->data,cur_size,hash);
+    md5hash((uint8_t*)chunk->data,cur_size,hash);
     // check hash code
 
-    if( memcmp(hash,chunk->hash,SHA1_HASH_SIZE) == 0) {
+    if( memcmp(hash,chunk->hash,MD5_HASH_SIZE) == 0) {
         return 1;
-    } else {
+    }    
+    else{
         return -1;
-
     }
 }

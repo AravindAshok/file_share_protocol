@@ -78,9 +78,10 @@ typedef struct data_packet {
     char data[DATALEN];
 } data_packet_t;
 
-
+//Initializing jobs
 int init_job(char* chunkFile, char* output_file);
-int is_file_finished();
+
+/* Finders, Senders and Makers */
 int packet_finder(char* buf);
 void packet_sender(data_packet_t* pkt, struct sockaddr* to);
 queue_t* GET_maker(data_packet_t *pkt,bt_peer_t* peer, queue_t* chunk_queue);
@@ -88,16 +89,19 @@ data_packet_t* ACK_maker(int ack, data_packet_t* pkt);
 data_packet_t* DENIED_maker();
 data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt);
 data_packet_t *packet_maker(int type, short pkg_len, u_int seq, u_int ack, char *data);
+
+/* Helper functions */
 void store_data(chunk_t* chunk, data_packet_t* pkt);
-void cat_chunks();
-int is_chunk_finished(chunk_t* chunk);
+int chunk_download_done(chunk_t* chunk);
 void packet_free(data_packet_t *pkg);
 void local2net(data_packet_t* pkt);
 void net2local(data_packet_t* pkt);
-void print_pkt(data_packet_t* pkt);
-void print_hash(uint8_t *hash);
 void clear_job();
 
+/* Printing stuff in the intermediate process. Helpful in debugging !! */
+void cat_chunks();
+void print_md5_hash();
+void print_pkt(data_packet_t* pkt);
 
 #endif
 
