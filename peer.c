@@ -78,9 +78,7 @@ void process_tcp(int sock) {
 
 
     fromlen = sizeof(from);
-    while ((res = TCP_recvfrom(sock, buf, PACKETLEN,
-                    0, (struct sockaddr *) &from,
-                    &fromlen)) != -1) {
+    while ((res = TCP_recvfrom(sock, buf, PACKETLEN, 0, (struct sockaddr *) &from, &fromlen)) != -1) {
         // change to local format
         net2local((data_packet_t*)buf);
         // call packet_parser
@@ -192,7 +190,7 @@ void process_tcp(int sock) {
 
 
 
-            case PKT_DATA: {
+            case FILE_UPLOAD: {
                                if(DEFAULT)
                                    fprintf(stderr, "receive data pkt,seq%d\n",
                                            ((data_packet_t*)buf)->header.seq_num);
@@ -261,7 +259,9 @@ void process_tcp(int sock) {
                                gettimeofday(&(down_conn->last_time), NULL);  // update last alive time
                                break;
                            }
-            case PKT_ACK: {
+
+
+            case FILE_UPLOAD_ALLOW: {
                               if(DEFAULT)
                                   fprintf(stderr, "recieve ACK:%d!\n",
                                           ((data_packet_t*)buf)->header.ack_num );
@@ -311,13 +311,13 @@ void process_tcp(int sock) {
                               break;
                           }
 
-            case PKT_DENIED: {
+            case FILE_UPLOAD_DENY: {
                                  break;
                              }
 
             default: {
-                         // Invalid packet
-                         fprintf(stderr,"Invalid Packet:%d!\n", packet_type);
+                         // Label the packet as an invalid packet
+                         fprintf(stderr,"Invalid Packet:%d!!!\n", packet_type);
                          break;
                      }
         }
