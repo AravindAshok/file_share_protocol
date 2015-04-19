@@ -33,8 +33,8 @@
 #define FILEDOWNLOAD		5
 #define FILEUPLOAD		6
 
-#define ACK 			7
-#define DENIED			8      
+#define FILEUPLOAD_ALLOW 	7
+#define FILEUPLOAD_DENY		8      
 #define CHUNK_SIZE      	(1 << 19)  //size of a single chunk in Bytes
 #define DEFAULT         	0
 
@@ -46,7 +46,7 @@ typedef struct chunk_s {
     	int cur_size;
 	int num_p;
 	peer_t *pvd; /* providers */
-} chunk_t;
+} chunk_t
  
 /* chunk_size = 512 * 1024 */
 // num_chunk * 512 * 1024 = file_size;max num_chunk = 4095
