@@ -53,14 +53,14 @@ typedef struct chunk_s {
 // largest file supports is 2GB - 512KB
 
 
-typedef struct job_s {
+typedef struct file_s {
     int num_chunk;   
     int num_need;
     int num_living;
     chunk_t* chunks;
     short living_flags;
     char get_chunk_file[BT_FILENAME_LEN];
-} job_t;
+} file_t;
 
 
 typedef struct header {
@@ -80,17 +80,12 @@ typedef struct data_packet {
 
 
 int init_job(char* chunkFile, char* output_file);
-int is_job_finished();
-int packet_parser(char* buf);
-void send_WhoHas(data_packet_t* pkt);
+int is_file_finished();
+int packet_finder(char* buf);
 void packet_sender(data_packet_t* pkt, struct sockaddr* to);
-queue_t *WhoHas_maker(void);
-data_packet_t *IHave_maker(data_packet_t *whohas_pkt);
-int match_need(uint8_t *hash);
 queue_t* GET_maker(data_packet_t *pkt,bt_peer_t* peer, queue_t* chunk_queue);
 data_packet_t* ACK_maker(int ack, data_packet_t* pkt);
 data_packet_t* DENIED_maker();
-void whohas_data_maker(int num_chunk, chunk_t *chunks, char* data);
 data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt);
 data_packet_t *packet_maker(int type, short pkg_len, u_int seq, u_int ack, char *data);
 void store_data(chunk_t* chunk, data_packet_t* pkt);
