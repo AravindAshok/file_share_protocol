@@ -415,11 +415,12 @@ If you use it, and if the socket type is SOCK_STREAM and the family is AF_INET, 
         exit(-1);
     }
 
-// Removing insane errors like "address already in use"
+    // Removing insane errors like "address already in use"
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     fcntl(sock, F_SETFL, O_NONBLOCK);
     bzero(&myaddr, sizeof(myaddr));
     myaddr.sin_family = AF_INET;
+
     //myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
     inet_aton("127.0.0.1", (struct in_addr *)&myaddr.sin_addr.s_addr);
     myaddr.sin_port = htons(config.myport);
@@ -429,7 +430,7 @@ If you use it, and if the socket type is SOCK_STREAM and the family is AF_INET, 
         exit(-1);
     }
 
-    spiffy_init(config.identity, (struct sockaddr *)&myaddr, sizeof(myaddr));
+    server_init()
     config.sock = sock;
     /* load my local chunk file list */
     init_hasChunk(config.has_chunk_file);
