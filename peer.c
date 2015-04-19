@@ -407,7 +407,10 @@ void peer_run() {
     int yes = 1;
     struct timeval tv;
 
-    if ((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP)) == -1) {
+/** Small note about the IPPROTO_IP macro. This constant has the value 0. It's actually an automatic choice depending on socket type and family.
+If you use it, and if the socket type is SOCK_STREAM and the family is AF_INET, then the protocol will automatically be TCP (exactly the same as if you'd used IPPROTO_TCP). Buf if you use IPPROTO_IP together with AF_INET and SOCK_RAW, you will have an error, because the kernel cannot choose a protocol automatically in this case.*****/
+
+    if ((sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP)) == -1) {
         perror("peer could not create socket");
         exit(-1);
     }
