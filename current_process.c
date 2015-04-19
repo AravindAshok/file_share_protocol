@@ -178,9 +178,23 @@ data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt) {
 }
 
 
-void cat_chunks(){
+void cat_chunks() {
+    FILE* fdout;
+    int i;
+    int num_chk = job.num_chunk;
+    chunk_t *chk_arr = job.chunks;
 
+    assert(job.num_need == 0);
+
+
+    fdout = fopen(config.output_file, "w");
+    for (i = 0; i < num_chk; i++) {
+        fwrite(chk_arr[i].data,1,CHUNK_SIZE,fdout);
+    }
+    fprintf(stderr, "cat finished!!!\n");
+    fclose(fdout);
 }
+
 
 void store_data(){
 
