@@ -163,7 +163,7 @@ void process_tcp(int sock) {
                                      }
                                      break;
                                  }
-            case VERIFY: {
+            case FILEHASH_VERIFY_: {
                              if(DEFAULT)
                                  fprintf();
                              up_conn = get_upload_connection(&upload_pool,peer);
@@ -189,8 +189,58 @@ void process_tcp(int sock) {
                          }
 
 
+	    case FILEHASH_CHECKALL: {
+                             if(DEFAULT)
+                                 fprintf();
+                             up_conn = get_upload_connection(&upload_pool,peer);
+                             if(upload_connection == NULL){
+                                 if(upload_pool < 10){
+                                     data_packet_t* verify_pkt = VERIFY_maker();
+                                     upload_connection = create_up_pool(&up_pool, peer, )// ************************* */;
+                                     if(upload_connection != NULL)
+                                        packet_sender
+                                     // send verify pkt
+                                     packet_sender(verify_pkt, (struct sockaddr*) &from);
+                                 }
 
-            case FILE_UPLOAD: {
+                                 else{
+                                             // sending pool full,construct denied pkt
+                                             data_packet_t* denied_pkt = DENIED_maker();
+                                             // send denied pkt
+                                             packet_sender(denied_pkt,(struct sockaddr*) &from);
+
+                                 }
+                             }
+
+                         }
+
+            case FILEDOWNLOAD: {
+                up_conn = get_up_conn(&up_pool,peer);
+                if(up_conn == NULL) {
+                    // new connetion
+                    if(up_pool.num >= 10) {
+                        // sending pool full,construct denied pkt
+                        data_packet_t* denied_pkt = DENIED_maker();
+                        // send denied pkt
+                        packet_sender(denied_pkt,(struct sockaddr*) &from);
+                    } else {
+                        // get data pkt array
+                        data_packet_t** data_pkt_array = DATA_pkt_array_maker((data_packet_t*)buf);
+                        // create a new uploading connection 
+                        up_conn = en_up_pool(&up_pool,peer,data_pkt_array);
+                        if( up_conn != NULL) {
+                            // send first data
+                            up_conn_recur_send(up_conn, (struct sockaddr*) &from);
+                        }
+                    }
+                } else {
+                    fprintf(stderr, "update!\n");
+                }
+                break;
+            }
+
+
+            case FILEUPLOAD: {
                                if(DEFAULT)
                                    fprintf(stderr, "receive data pkt,seq%d\n",
                                            ((data_packet_t*)buf)->header.seq_num);
