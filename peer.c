@@ -382,7 +382,7 @@ void process_get(char *chunkfile, char *outputfile) {
             chunkfile, outputfile);
     /* Create a Job */
     init_job(chunkfile,outputfile);
-
+f
     /* call whohasmaker */
     queue_t* whoHasQueue = WhoHas_maker();
     /* send out all whohas packets */
@@ -397,20 +397,6 @@ void process_get(char *chunkfile, char *outputfile) {
     //freeJob(job);
 
 }
-
-void handle_user_input(char *line, void *cbdata) {
-    char chunkf[128], outf[128];
-
-    bzero(chunkf, sizeof(chunkf));
-    bzero(outf, sizeof(outf));
-
-    if (sscanf(line, "GET %120s %120s", chunkf, outf)) {
-        if (strlen(outf) > 0) {
-            process_get(chunkf, outf);
-        }
-    }
-}
-
 
 void peer_run() {
     int sock;
