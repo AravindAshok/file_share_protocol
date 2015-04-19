@@ -263,15 +263,16 @@ void process_tcp(int sock) {
 
             case FILE_UPLOAD_ALLOW: {
                               if(DEFAULT)
-                                  fprintf(stderr, "recieve ACK:%d!\n",
-                                          ((data_packet_t*)buf)->header.ack_num );
+                                  fprintf(stderr, "recieved ALLOW response. ALLOW response number is %d\n", ((data_packet_t*)buf)->header.ack_num);
                               // continue send data pkt if not finished
-                              up_conn = get_up_conn(&up_pool,peer);
+                              upload_conn = get_upload_conn(&up_pool,peer);
                               // check ACK
                               if( ((data_packet_t*)buf)->header.ack_num == 512) {
                                   // downloading finished
-                                  de_up_pool(&up_pool,peer);
-                              } else if (up_conn->l_ack+1 <= ((data_packet_t*)buf)->header.ack_num) {
+                                  delete_upload_pool(&upload_pool,peer);
+                              }
+
+                              else if (up_conn->l_ack+1 <= ((data_packet_t*)buf)->header.ack_num) {
                                   // valid ack
                                   up_conn->duplicate = 1;
                                   up_conn->l_ack = ((data_packet_t*)buf)->header.ack_num;
