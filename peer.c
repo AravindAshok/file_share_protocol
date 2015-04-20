@@ -42,23 +42,16 @@ uint32_t some_short = 20;
 int main(int argc, char **argv) {
 
     init(&config, argc, argv);
-
-    DPRINTF(DEBUG_INIT, "peer.c main beginning\n");
+    printf("peer main beginning\n");   /* Debug info */
 
 #ifdef TESTING
     config.identity = 1; // your group number here
     strcpy(config.chunk_file, "chunkfile");
     strcpy(config.has_chunk_file, "haschunks");
 #endif
-
+    
+    printf("Peer initialized.... \nYou are good to go now !!!\n");
     parse_command_line(&config);
-
-#ifdef DEBUG
-    if (debug & DEBUG_INIT) {
-        dump_config(&config);
-    }
-#endif
-
     peer_run(&config);
     return 0;
 }
