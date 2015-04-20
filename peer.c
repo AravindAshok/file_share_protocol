@@ -378,8 +378,7 @@ void process_tcp(int sock) {
 }
 
 void process_get(char *chunkfile, char *outputfile) {
-    printf("PROCESS GET SKELETON CODE CALLED.  Fill me in!  (%s, %s)\n",
-            chunkfile, outputfile);
+    printf("PROCESS GET SKELETON CODE CALLED.  Fill me in!  (%s, %s)\n", chunkfile, outputfile);
     /* Create a Job */
     init_job(chunkfile,outputfile);
 
@@ -455,8 +454,7 @@ If you use it, and if the socket type is SOCK_STREAM and the family is AF_INET, 
                 process_inbound_udp(sock);
             }
             if (FD_ISSET(STDIN_FILENO, &readfds)) {
-                process_user_input(STDIN_FILENO, userbuf, handle_user_input,
-                        "Currently unused");
+                process_user_input(STDIN_FILENO, userbuf, handle_user_input, "Currently unused");
             }
         } else {
             //timeout and try to reflood
