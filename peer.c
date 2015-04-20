@@ -15,11 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "debug.h"
-#include "spiffy.h"
-#include "parse.h"
-#include "input_buffer.h"
 #include "queue.h"
-#include "job.h"
+#include "current_process.h"
 #include "chunk.h"
 #include "connection.h"
 

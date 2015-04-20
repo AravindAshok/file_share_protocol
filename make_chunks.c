@@ -13,7 +13,7 @@
 #include<unistd.h>
 #include<stdlib.h>
 
-#include "md-5.h"
+#include "md5.h"
 #include "chunk.h"
 
 static int num_chunks();

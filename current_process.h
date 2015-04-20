@@ -2,7 +2,6 @@
 #define _JOB_H
 
 #include "md5.h"
-#include "parse.h"
 #include "queue.h"
 #include "chunk.h"
 #include <sys/socket.h>

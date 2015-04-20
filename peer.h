@@ -2,7 +2,6 @@
 #define _PEER_H
 
 #include "md5.h"
-#include "parse.h"
 
 
 typedef struct job_s {
