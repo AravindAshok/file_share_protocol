@@ -37,6 +37,39 @@
 #define CHUNK_SIZE      	(1 << 19)  //size of a single chunk in Bytes
 #define DEFAULT         	0
 
+#ifndef _PARSE_H_
+#define _PARSE_H_
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/time.h>
+#include <stdio.h>
+
+#define FILENAME_LEN 255
+#define MAX_PEERS 1024
+
+typedef struct peer {
+  short  id;
+  struct sockaddr_in addr;
+  struct peer *next;
+} peer_t;
+
+typedef struct config {
+  char  chunk_file[FILENAME_LEN];
+  char  has_chunk_file[FILENAME_LEN];
+  char  output_file[FILENAME_LEN];
+  char  peer_list_file[FILENAME_LEN];
+  int   max_conn;
+  short identity;
+  unsigned short myport;
+  struct timeval start_time;
+  FILE *cwnd;
+  int sock;
+  int argc; 
+  char **argv;
+  peer_t *peers;
+}config_t;
 
 typedef struct chunk_s {
 	int id;
@@ -58,7 +91,7 @@ typedef struct file_s {
     int num_living;
     chunk_t* chunks;
     short living_flags;
-    char get_chunk_file[BT_FILENAME_LEN];
+    char get_chunk_file[FILENAME_LEN];
 } file_t;
 
 
@@ -83,7 +116,7 @@ int init_job(char* chunkFile, char* output_file);
 /* Finders, Senders and Makers */
 int packet_finder(char* buf);
 void packet_sender(data_packet_t* pkt, struct sockaddr* to);
-queue_t* GET_maker(data_packet_t *pkt,bt_peer_t* peer, queue_t* chunk_queue);
+queue_t* GET_maker(data_packet_t *pkt,peer_t* peer, queue_t* chunk_queue);
 data_packet_t* ACK_maker(int ack, data_packet_t* pkt);
 data_packet_t* DENIED_maker();
 data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt);
