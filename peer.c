@@ -425,6 +425,8 @@ If you use it, and if the socket type is SOCK_STREAM and the family is AF_INET, 
     config.sock = sock;
     /* load my local chunk file list */
     init_hasChunk(config.has_chunk_file);
+
+    /* Initialize download and upload connections */
     init_down_pool(&down_pool);
     init_up_pool(&up_pool);
 
@@ -443,7 +445,7 @@ If you use it, and if the socket type is SOCK_STREAM and the family is AF_INET, 
         nfds = select(sock+1, &readfds, NULL, NULL, &tv);
         if (nfds > 0) {
             if (FD_ISSET(sock, &readfds)) {
-                process_inbound_udp(sock);
+                process_tcp;
             }
             if (FD_ISSET(STDIN_FILENO, &readfds)) {
                 process_user_input(STDIN_FILENO, userbuf, handle_user_input, "Currently unused");
