@@ -5,7 +5,7 @@
 *Description: takes care of the current process it handles
 ***************************************************************************/
 
-#include "current.h"
+#include "current_process.h"
 
 
 
