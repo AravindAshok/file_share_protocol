@@ -442,33 +442,6 @@ If you use it, and if the socket type is SOCK_STREAM and the family is AF_INET, 
         if (DEFAULT)
             fprintf(stderr, "New Select with%ld, %d\n", tv.tv_sec, tv.tv_usec);
 
-        nfds = select(sock+1, &readfds, NULL, NULL, &tv);
-        if (nfds > 0) {
-            if (FD_ISSET(sock, &readfds)) {
-                process_tcp;
-            }
-            if (FD_ISSET(STDIN_FILENO, &readfds)) {
-                process_user_input(STDIN_FILENO, userbuf, handle_user_input, "Currently unused");
-            }
-        } else {
-            //timeout and try to reflood
-            if (DEFAULT)
-                fprintf(stderr, "Select timed out!!\n");
-            if (is_job_finished())
-                continue;  // no job pending
-            else {
-                if (DEFAULT)
-                    fprintf(stderr, "About to check living\n");
-                check_living();
-
-                if (!is_job_finished())
-                    flood_WhoHas();
-
-                if (DEFAULT)
-                    fprintf(stderr, "Finish check living\n" );
-            }
-        }
-    }
 }
 
 void init_hasChunk(char* chunk_file) {
