@@ -51,7 +51,6 @@ int main(int argc, char **argv) {
 #endif
     
     printf("Peer initialized.... \nYou are good to go now !!!\n");
-    parse_command_line(&config);
     peer_run(&config);
     return 0;
 }
