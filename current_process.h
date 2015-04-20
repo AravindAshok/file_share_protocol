@@ -71,7 +71,7 @@ typedef struct config {
   peer_t *peers;
 }config_t;
 
-typedef struct chunk_s {
+typedef struct chunk {
 	int id;
 	uint8_t hash[MD5_HASH_SIZE];
 	char *data;
@@ -85,7 +85,7 @@ typedef struct chunk_s {
 // largest file supports is 2GB - 512KB
 
 
-typedef struct file_s {
+typedef struct file {
     int num_chunk;   
     int num_need;
     int num_living;
