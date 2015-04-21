@@ -40,7 +40,7 @@ void md5_hash(uint8_t *chaine, int len, uint8_t *hash){
 	hash = digest;
 }
 
-void bin2hex(uint8_t *buf, int len, char *ascii);{
+void bin2hex(uint8_t *buf, int len, uint8_t *hex){
 	int i;
 	for(i=0;i<len;i++){
 		sprintf(hex+(i*2), "%.2x", buf[i]);

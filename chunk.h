@@ -1,8 +1,9 @@
-
 #ifndef _CHUNK_H_
 #define _CHUNK_H_
 #include <stdio.h>
 #include <inttypes.h>
+#include <string.h>
+#include "md5.h"
 
 #define CHUNK_SIZE (512 * 1024)
 
@@ -23,3 +24,6 @@ void bin2hex(uint8_t *buf, int len, char *ascii);
 
 /* converts an ascii to hex */
 void hex2bin(char *ascii, int len, uint8_t *buf);
+
+/* converts an ascii string to hex */
+void ascii2binary(char *hex, int len, uint8_t*buf) 

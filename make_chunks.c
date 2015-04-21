@@ -44,6 +44,7 @@ int main(int argc, char *argv){
     for(i=0;i<numchunks;i++){
     hashes[i] = calloc(sizeof(uint8_t), (MD5_HASH_SIZE))
 
+    /****Sanity Testing***/
     if(hashes[i] == NULL){
         fprintf(stderr, "Out of memory !!");
         exit(-1);
