@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-    int make_chunks(FILE *fp, uint8_t **chunk_hashes);
+    void md5_hash(uint8_t *chaine, int len, uint8_t *hash);
 
     /* return the md-5 hash of the string */
     void md5_hash(uint8_t *chr, int len, uint8_t *t);
@@ -23,7 +23,7 @@ extern "C" {
     void hex2bin(char *ascii, int len, uint8_t *buf);
 
     /* converts an ascii string to hex */
-    void ascii2binary(char *hex, int len, uint8_t*buf)
+    void hex2binary(char *hex, int len, uint8_t*buf)
 
 #ifdef __cplusplus
 }

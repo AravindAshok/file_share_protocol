@@ -9,7 +9,7 @@
 
 void md5_hash(uint8_t *chaine, int len, uint8_t *hash){
     struct md5_ctx ctx;
-    unsigned char digest(16);
+    unsigned char digest[16];
 
     //init the md5 process
     md5_init(&ctx);
@@ -55,4 +55,3 @@ int make_chunks(FILE *fp, uint8_t *chunk_hashes){
     }
     return numchunks;
 }
-
