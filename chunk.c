@@ -40,15 +40,15 @@ void hex2bin(char *hex, int len, uint8_t *buf){
 }
 int make_chunks(FILE *fp, uint8_t *chunk_hashes){
 
-    uint8_t *buffer = (uint8_t*) malloc(CHUNK_SIZE);
+    uint8_t *buffer = (uint8_t*) calloc(CHUNK_SIZE,0);
     int numchunks = 0;
     int numbytes = 0;
 
-    while((numbytes = fread(buffer))){
-        md5_hash(buffer, sizeof(uint8_t),
-    }
+    while((numbytes = fread(buffer, sizeof(uint8_t), CHUNK_SIZE, fp)) > 0 ) {
+    md5hash(buffer, numbytes, chunk_hashes[numchunks++]);
 }
-
+return numchunks;
+}
 
 int main(int argc, char *argv[]){
     uint8_t *test = "test";
