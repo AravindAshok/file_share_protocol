@@ -5,9 +5,16 @@
  *Description: Divides a file to chunks
 
  ***************************************************************************/
-#include "chunk.h"
 
-void md5_hash(uint8_t *chaine, int len, uint8_t *hash){
+#include "md5.h"
+#include "chunk.h"
+#include <ctype.h>
+#include <assert.h>
+#include <stdlib.h> // for malloc
+#include <string.h> // for memset
+
+
+void md5_hash(uint8_t *chaine, int len, uint8_t *hash) {
     struct md5_ctx ctx;
     unsigned char digest[16];
 
@@ -20,7 +27,7 @@ void md5_hash(uint8_t *chaine, int len, uint8_t *hash){
     hash = digest;
 }
 
-void bin2hex(uint8_t* buf, int len, char* ascii){
+void bin2hex(uint8_t* buf, int len, char* ascii) {
     int i;
     for(i=0;i<len;i++){
         sprintf(ascii+(i*2), "%.2x", buf[i]);
@@ -28,8 +35,7 @@ void bin2hex(uint8_t* buf, int len, char* ascii){
     ascii[len*2] = 0;
 }
 
-static uint8_t hex2bin(char hex)
-{
+static uint8_t hex2bin(char hex) {
     hex = toupper(hex);
     uint8_t c = ((hex <= '9') ? (hex - '0') : (hex - ('A' - 0x0A)));
     return c;
@@ -44,7 +50,7 @@ void hex2binary(char *hex, int len, uint8_t*buf) {
 }
 
 
-int make_chunks(FILE *fp, uint8_t *chunk_hashes){
+int make_chunks(FILE *fp, uint8_t *chunk_hashes) {
 
     uint8_t *buffer = (uint8_t*) calloc(CHUNK_SIZE,0);
     int numchunks = 0;
@@ -55,3 +61,26 @@ int make_chunks(FILE *fp, uint8_t *chunk_hashes){
     }
     return numchunks;
 }
+
+#ifdef _TEST_CHUNK_C_
+
+int main(int argc, char *argv[]) {
+	uint8_t *test = "test";
+	uint8_t hash1[MD5_HASH_SIZE], hash2[MD5_HASH_SIZE];
+	char ascii[MD5_HASH_SIZE*2 + 1];
+
+	printf("Testing a character string..\n");
+	md5_hash(test, 4, hash1);
+
+	bin2hex(hash1,MD5_HASH_SIZE,ascii);
+	printf("%s\n",ascii);
+
+	assert(strlen(ascii)==32);
+
+	hex2binary(ascii, strlen(ascii), hash2);
+
+	bin2hex(hash2, MD5_HASH_SIZE,ascii);
+	printf("%s\n", ascii);
+}
+
+#endif //_TEST_CHUNK_C_
