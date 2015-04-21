@@ -17,7 +17,7 @@ typedef struct download_connection {
 	queue_t* get_queue;
 	struct timeval last_time;
 	int next_pkt; // next expected pkt number
-}down_conn_t;
+}download_connection_t;
 
 
 typedef struct upload_connection {
@@ -28,19 +28,19 @@ typedef struct upload_connection {
 	int duplicate;
 	float cwnd;
 	int ssthresh;
-}up_conn_t;
+}upload_connection_t;
 
 typedef struct download_pool {
 	down_conn_t** connection;
 	int* flag;
 	int num;
-}down_pool_t;
+}download_pool_t;
 
 typedef struct upload_pool {
 	up_conn_t** connection;
 	int* flag;
 	int num;	
-}up_pool_t;
+}upload_pool_t;
 
 //Initialization handlers
 void init_download_pool(download_pool_t* pool);

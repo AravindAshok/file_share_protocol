@@ -133,7 +133,7 @@ void update_upload_connection(up_connection_t* conn, peer_t* peer, data_packet_t
 	conn->ssthresh = INIT_SSTHRESH;
 }
 
-void update_download_connection( download_connection_t* conn, peer_t* peer) {
+void update_download_connection(download_connection_t* conn, peer_t* peer) {
 	// removed finished GET request
 	conn->next_pkt = 1;
 }
