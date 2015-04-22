@@ -26,7 +26,7 @@ int init_job(char* chunkFile, char* output_file) {
     int line_number = 0;
     int i = 0;
     char read_buffer[BUF_SIZE];
-    char hash_buffer[SHA1_HASH_SIZE*2];
+    char hash_buffer[MD5_HASH_SIZE*2];
 
     
     /* get chunks number */
@@ -46,9 +46,9 @@ int init_job(char* chunkFile, char* output_file) {
     while (fgets(read_buffer,BUF_SIZE,file)) {
         sscanf(read_buffer,"%d %s",&(job.chunks[i].id),hash_buffer);
         /* convert ascii to binary hash code */
-        hex2binary(hash_buffer,SHA1_HASH_SIZE*2,job.chunks[i].hash);        
+        hex2binary(hash_buffer,MD5_HASH_SIZE*2,job.chunks[i].hash);        
         memset(read_buffer,0,BUF_SIZE);
-        memset(hash_buffer,0,SHA1_HASH_SIZE*2);
+        memset(hash_buffer,0,MD5_HASH_SIZE*2);
         job.chunks[i].pvd = NULL;
         job.chunks[i].num_p = 0;
         job.chunks[i].cur_size = 0;
@@ -177,12 +177,12 @@ int is_chunk_finished(chunk_t* chunk) {
 
         return 0;
     }
-    uint8_t hash[SHA1_HASH_SIZE];
+    uint8_t hash[MD5_HASH_SIZE];
     // get hash code
     shahash((uint8_t*)chunk->data,cur_size,hash);
     // check hash code
 
-    if( memcmp(hash,chunk->hash,SHA1_HASH_SIZE) == 0) {
+    if( memcmp(hash,chunk->hash,MD5_HASH_SIZE) == 0) {
         return 1;
     } else {
         return -1;
@@ -226,7 +226,7 @@ queue_t* GET_maker(peer_t* provider, queue_t* chunk_queue) {
             chk[match_idx].num_p = 1;
             job.num_living |= (1 << match_idx);   // this chunks is living
             pkt = packet_maker(PKT_GET,
-                               HEADERLEN + SHA1_HASH_SIZE,
+                               HEADERLEN + MD5_HASH_SIZE,
                                0, 0, (char *)hash);
             enqueue(q, (void *)pkt);
             enqueue(chunk_queue,(void*)(chk+match_idx));
@@ -294,15 +294,6 @@ void print_pkt(data_packet_t* pkt) {
     fprintf(stderr, "packet_len:\t\t%d\n", hdr->packet_len);
     fprintf(stderr, "seq_num:\t\t%d\n", hdr->seq_num);
     fprintf(stderr, "ack_num:\t\t%d\n", hdr->ack_num);
-    if (PKT_WHOHAS == hdr->packet_type || PKT_IHAVE == hdr->packet_type) {
-        num = pkt->data[0];
-        fprintf(stderr, "1st bytes data:\t\t%x\n", pkt->data[0]);
-        hash = (uint8_t *)(pkt->data + 4);
-        for (i = 0; i < num; i++) {
-            print_hash(hash);
-            hash += SHA1_HASH_SIZE;
-        }
-    }
     fprintf(stderr, "*************END*************\n");
 }
 
