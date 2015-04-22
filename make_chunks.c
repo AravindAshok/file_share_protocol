@@ -74,11 +74,11 @@ int find_numchunks(char *filename){
     if( !stat(filename, &file)) {
 
         double size_file = (double) file.st_size;
-        return ceil(length/ CHUNK_SIZE);
+        return ceil(size_file/ CHUNK_SIZE);
     }
     else{
         //return error
-        return -1
+        return -1;
     }
 }
 
