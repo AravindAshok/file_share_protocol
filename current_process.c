@@ -7,6 +7,9 @@
 
 #include "current_process.h"
 
+extern config_t config;
+extern file_t job;
+extern queue_t* hasChunk;
 
 
 static const char *requests={"IndexGet RegEx",
@@ -136,7 +139,7 @@ data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt) {
                 //fseek(data_file,index,SEEK_SET);
                 for (i = 0;i < 512;i++) {
                     // load data
-                    data_pkt_array[i] = packet_maker(PKT_DATA,
+                    data_pkt_array[i] = generate_packet(PKT_DATA,
                                                 1040,i+1,0,
                                                 src+index*CHUNK_SIZE+i*1024);
                 }
@@ -205,10 +208,8 @@ void pkt2chunk(chunk_t* chunk, data_packet_t* pkt) {
 
 
 queue_t* GET_maker(peer_t* provider, queue_t* chunk_queue) {
-    assert(ihave_pkt->header.packet_type == PKT_IHAVE);
-    int num = ihave_pkt->data[0]; // num of chunk that peer has
-    //int num_match = 0;
-    int i;
+/*************************************/
+    int i,num;
     int match_idx;
     chunk_t* chk = job.chunks;  // the needed chunk here
     queue_t *q;      // the queue of GET request
@@ -218,16 +219,14 @@ queue_t* GET_maker(peer_t* provider, queue_t* chunk_queue) {
         return NULL;
 
     q = queue_init();
-    hash = (uint8_t *)(ihave_pkt->data + 4); // the start of hash
+   // hash = (uint8_t *)(ihave_pkt->data + 4); // the start of hash
     for (i = 0; i < num; i++) {
         match_idx = match_need(hash);
         if (-1 != match_idx) {
             chk[match_idx].pvd = provider;
             chk[match_idx].num_p = 1;
             job.num_living |= (1 << match_idx);   // this chunks is living
-            pkt = packet_maker(PKT_GET,
-                               HEADERLEN + MD5_HASH_SIZE,
-                               0, 0, (char *)hash);
+            pkt = packet_maker(PKT_GET,HEADERLEN + MD5_HASH_SIZE, 0, 0, (char *)hash);
             enqueue(q, (void *)pkt);
             enqueue(chunk_queue,(void*)(chk+match_idx));
             if (config.peers->next->next != NULL)
@@ -247,8 +246,8 @@ void packet_sender(data_packet_t* pkt, struct sockaddr* to) {
         fprintf(stderr, "send %s pkt!*********\n", type2str[type]);
     print_pkt(pkt);
     hostToNet(pkt);
-    spiffy_sendto(config.sock, pkt, pkt_size, 0, to, sizeof(*to));
-    netToHost(pkt);
+    TCP_send(config.sock, pkt, pkt_size, 0, to, sizeof(*to));
+    net2local(pkt);
 }
 
 /*******************************************************************/
@@ -275,9 +274,6 @@ void send_(){
 
 }
 
-data_packet_t *generate_packet(){
-
-}
 
 void print_pkt(data_packet_t* pkt) {
     if (DEFAULT != 1)
