@@ -59,7 +59,7 @@ void delete_upload_pool(upload_pool_t* pool, peer_t* peer);
 download_connection_t* get_download_connection(download_pool_t* pool, peer_t* peer);
 upload_connection_t* get_update_connection(upload_pool_t* pool, peer_t* peer);
 void upload_connection_recur_send(upload_connection_t* conn, struct sockaddr* to);
-void update_download_connection( down_connection_t* conn, peer_t* peer);
+void update_download_connection( download_connection_t* conn, peer_t* peer);
 void update_upload_connection(upload_connection_t* conn, peer_t* peer, data_packet_t* get_pkt);
 
 #endif

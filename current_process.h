@@ -1,5 +1,5 @@
-#ifndef _JOB_H
-#define _JOB_H
+#ifndef _PROCESS_H
+#define _PROCESS_H
 
 #include "md5.h"
 #include "queue.h"
@@ -34,11 +34,8 @@
 
 #define FILEUPLOAD_ALLOW 	7
 #define FILEUPLOAD_DENY		8      
-#define CHUNK_SIZE      	(1 << 19)  //size of a single chunk in Bytes
+//#define CHUNK_SIZE      	(1 << 19)  //size of a single chunk in Bytes
 #define DEFAULT         	0
-
-#ifndef _PARSE_H_
-#define _PARSE_H_
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -78,7 +75,7 @@ typedef struct chunk {
     	int cur_size;
 	int num_p;
 	peer_t *pvd; /* providers */
-} chunk_t
+} chunk_t;
  
 /* chunk_size = 512 * 1024 */
 // num_chunk * 512 * 1024 = file_size;max num_chunk = 4095
