@@ -1,5 +1,5 @@
 /***************************************************************************
-*Author:  Kiran Kumar Lekkala                                                                 
+*Author:  Nagarjuna Chidara                                                                 
 *Date:  12 April 2015                                                                  
 *Filename: timer.c                                                                 
 *Description: Helper function for timing                                                             
