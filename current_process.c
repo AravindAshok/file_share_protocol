@@ -12,13 +12,16 @@ extern file_t job;
 extern queue_t* hasChunk;
 
 
-static const char *requests={"IndexGet RegEx",
-                             "IndexGet ShortList",
-                             "IndexGet Longlist",
-                             "FileHash Verify",
-                             "FileHash Check_All",
-                             "FileDownload",
-                             "FileUpload" };
+static const char *type2str={"INDEXGET_SHORTLIST_"
+			     "INDEXGET_LONGLIST_"    
+                             "INDEXGET_REGEX_"	
+                             "FILEHASH_VERIFY_"	
+                             "FILEHASH_CHECKALL_"
+                             "FILEDOWNLOAD_"	
+                             "FILEUPLOAD_"	
+                             "FILEUPLOAD_ALLOW_" 
+                             "FILEUPLOAD_DENY_"
+                             }	
 
 
 int init_job(char* chunkFile, char* output_file) {
@@ -226,7 +229,7 @@ queue_t* GET_maker(peer_t* provider, queue_t* chunk_queue) {
             chk[match_idx].pvd = provider;
             chk[match_idx].num_p = 1;
             job.num_living |= (1 << match_idx);   // this chunks is living
-            pkt = packet_maker(PKT_GET,HEADERLEN + MD5_HASH_SIZE, 0, 0, (char *)hash);
+            pkt = packet_maker(FILEDOWNLOAD, HEADERLEN + MD5_HASH_SIZE, 0, 0, (char *)hash);
             enqueue(q, (void *)pkt);
             enqueue(chunk_queue,(void*)(chk+match_idx));
             if (config.peers->next->next != NULL)
