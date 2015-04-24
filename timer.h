@@ -3,11 +3,10 @@
 
 #include <sys/time.h>
 
-#include "bt_parse.h"
 #include "queue.h"
 #include "chunk.h"
-#include "sha.h"
-#include "job.h"
+#include "md5.h"
+#include "current_process.h"
 
 int get_time_diff(struct timeval* start);
 

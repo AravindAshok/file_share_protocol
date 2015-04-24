@@ -5,17 +5,23 @@
 *Description: takes care of the current process it handles
 ***************************************************************************/
 
-#include "current.h"
+#include "current_process.h"
+
+extern config_t config;
+extern file_t job;
+extern queue_t* hasChunk;
 
 
-
-static const char *requests={"IndexGet RegEx",
-                             "IndexGet ShortList",
-                             "IndexGet Longlist",
-                             "FileHash Verify",
-                             "FileHash Check_All",
-                             "FileDownload",
-                             "FileUpload" };
+static const char *type2str={"INDEXGET_SHORTLIST_"
+			     "INDEXGET_LONGLIST_"    
+                             "INDEXGET_REGEX_"	
+                             "FILEHASH_VERIFY_"	
+                             "FILEHASH_CHECKALL_"
+                             "FILEDOWNLOAD_"	
+                             "FILEUPLOAD_"	
+                             "FILEUPLOAD_ALLOW_" 
+                             "FILEUPLOAD_DENY_"
+                             }	
 
 
 int init_job(char* chunkFile, char* output_file) {
@@ -26,7 +32,7 @@ int init_job(char* chunkFile, char* output_file) {
     int line_number = 0;
     int i = 0;
     char read_buffer[BUF_SIZE];
-    char hash_buffer[SHA1_HASH_SIZE*2];
+    char hash_buffer[MD5_HASH_SIZE*2];
 
     
     /* get chunks number */
@@ -46,9 +52,9 @@ int init_job(char* chunkFile, char* output_file) {
     while (fgets(read_buffer,BUF_SIZE,file)) {
         sscanf(read_buffer,"%d %s",&(job.chunks[i].id),hash_buffer);
         /* convert ascii to binary hash code */
-        hex2binary(hash_buffer,SHA1_HASH_SIZE*2,job.chunks[i].hash);        
+        hex2binary(hash_buffer,MD5_HASH_SIZE*2,job.chunks[i].hash);        
         memset(read_buffer,0,BUF_SIZE);
-        memset(hash_buffer,0,SHA1_HASH_SIZE*2);
+        memset(hash_buffer,0,MD5_HASH_SIZE*2);
         job.chunks[i].pvd = NULL;
         job.chunks[i].num_p = 0;
         job.chunks[i].cur_size = 0;
@@ -136,7 +142,7 @@ data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt) {
                 //fseek(data_file,index,SEEK_SET);
                 for (i = 0;i < 512;i++) {
                     // load data
-                    data_pkt_array[i] = packet_maker(PKT_DATA,
+                    data_pkt_array[i] = generate_packet(PKT_DATA,
                                                 1040,i+1,0,
                                                 src+index*CHUNK_SIZE+i*1024);
                 }
@@ -177,12 +183,12 @@ int is_chunk_finished(chunk_t* chunk) {
 
         return 0;
     }
-    uint8_t hash[SHA1_HASH_SIZE];
+    uint8_t hash[MD5_HASH_SIZE];
     // get hash code
     shahash((uint8_t*)chunk->data,cur_size,hash);
     // check hash code
 
-    if( memcmp(hash,chunk->hash,SHA1_HASH_SIZE) == 0) {
+    if( memcmp(hash,chunk->hash,MD5_HASH_SIZE) == 0) {
         return 1;
     } else {
         return -1;
@@ -205,10 +211,8 @@ void pkt2chunk(chunk_t* chunk, data_packet_t* pkt) {
 
 
 queue_t* GET_maker(peer_t* provider, queue_t* chunk_queue) {
-    assert(ihave_pkt->header.packet_type == PKT_IHAVE);
-    int num = ihave_pkt->data[0]; // num of chunk that peer has
-    //int num_match = 0;
-    int i;
+/*************************************/
+    int i,num;
     int match_idx;
     chunk_t* chk = job.chunks;  // the needed chunk here
     queue_t *q;      // the queue of GET request
@@ -218,16 +222,14 @@ queue_t* GET_maker(peer_t* provider, queue_t* chunk_queue) {
         return NULL;
 
     q = queue_init();
-    hash = (uint8_t *)(ihave_pkt->data + 4); // the start of hash
+   // hash = (uint8_t *)(ihave_pkt->data + 4); // the start of hash
     for (i = 0; i < num; i++) {
         match_idx = match_need(hash);
         if (-1 != match_idx) {
             chk[match_idx].pvd = provider;
             chk[match_idx].num_p = 1;
             job.num_living |= (1 << match_idx);   // this chunks is living
-            pkt = packet_maker(PKT_GET,
-                               HEADERLEN + SHA1_HASH_SIZE,
-                               0, 0, (char *)hash);
+            pkt = packet_maker(FILEDOWNLOAD, HEADERLEN + MD5_HASH_SIZE, 0, 0, (char *)hash);
             enqueue(q, (void *)pkt);
             enqueue(chunk_queue,(void*)(chk+match_idx));
             if (config.peers->next->next != NULL)
@@ -247,8 +249,8 @@ void packet_sender(data_packet_t* pkt, struct sockaddr* to) {
         fprintf(stderr, "send %s pkt!*********\n", type2str[type]);
     print_pkt(pkt);
     hostToNet(pkt);
-    spiffy_sendto(config.sock, pkt, pkt_size, 0, to, sizeof(*to));
-    netToHost(pkt);
+    TCP_send(config.sock, pkt, pkt_size, 0, to, sizeof(*to));
+    net2local(pkt);
 }
 
 /*******************************************************************/
@@ -275,9 +277,6 @@ void send_(){
 
 }
 
-data_packet_t *generate_packet(){
-
-}
 
 void print_pkt(data_packet_t* pkt) {
     if (DEFAULT != 1)
@@ -294,15 +293,6 @@ void print_pkt(data_packet_t* pkt) {
     fprintf(stderr, "packet_len:\t\t%d\n", hdr->packet_len);
     fprintf(stderr, "seq_num:\t\t%d\n", hdr->seq_num);
     fprintf(stderr, "ack_num:\t\t%d\n", hdr->ack_num);
-    if (PKT_WHOHAS == hdr->packet_type || PKT_IHAVE == hdr->packet_type) {
-        num = pkt->data[0];
-        fprintf(stderr, "1st bytes data:\t\t%x\n", pkt->data[0]);
-        hash = (uint8_t *)(pkt->data + 4);
-        for (i = 0; i < num; i++) {
-            print_hash(hash);
-            hash += SHA1_HASH_SIZE;
-        }
-    }
     fprintf(stderr, "*************END*************\n");
 }
 

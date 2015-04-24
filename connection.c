@@ -10,8 +10,13 @@ Downloading/Uploading connections.
 #include "connection.h"
 #include "current_process.h"
 
-void init_upload_connection(up_connection_t** conn, peer_t* receiver, data_packet_t** pkt_array) {
-	(*conn) = (up_connection_t*)malloc(sizeof(up_connection_t));
+
+extern config_t config;
+extern file_t job;
+
+
+void init_upload_connection(upload_connection_t** conn, peer_t* receiver, data_packet_t** pkt_array) {
+	(*conn) = (upload_connection_t*)malloc(sizeof(upload_connection_t));
 	(*conn)->receiver = receiver;
 	(*conn)->pkt_array = pkt_array;
 	(*conn)->l_ack = 0;
@@ -21,7 +26,7 @@ void init_upload_connection(up_connection_t** conn, peer_t* receiver, data_packe
 	(*conn)->ssthresh = INIT_SSTHRESH;
 }
 
-void init_download_connection(download_connection_t** connection, peer_t* provider, queue_t* chunk, queue_t* get_queue) {
+void init_download_connection(download_connection_t** conn, peer_t* provider, queue_t* chunk, queue_t* get_queue) {
 	(*conn) = (download_connection_t*)malloc(sizeof(download_connection_t));
 	(*conn)->provider = provider;
 	(*conn)->chunks = chunk;
@@ -32,7 +37,7 @@ void init_download_connection(download_connection_t** connection, peer_t* provid
 
 void init_download_pool(download_pool_t* pool) {
 	int i = 0 ;
-	int max = config.max_connection;
+	int max = config.max_conn;
 	pool->flag = (int*)malloc(sizeof(int)*max);
 	pool->connection = (download_connection_t**)malloc(sizeof(download_connection_t*)*max);
 	int* flags = pool->flag;
@@ -42,9 +47,9 @@ void init_download_pool(download_pool_t* pool) {
 }
 
 
-void init_upload_pool(up_pool_t* pool) {
+void init_upload_pool(upload_pool_t* pool) {
 	int i = 0 ;
-	int max = config.max_connection;
+	int max = config.max_conn;
 
 	pool->flag = (int*)malloc(sizeof(int)*max);
 	pool->connection = (upload_connection_t**)malloc(sizeof(upload_connection_t));
@@ -56,7 +61,7 @@ void init_upload_pool(up_pool_t* pool) {
 
 void delete_upload_pool(upload_pool_t* pool,peer_t* peer) {
 	int i = 0;
-	up_connection_t** conns = pool->connection;
+	upload_connection_t** conns = pool->connection;
 	while( i < config.max_conn ) {
 		if( pool->flag[i] == 1 && conns[i]->receiver->id == peer->id) {
 			conns[i]->receiver = NULL;
@@ -110,8 +115,8 @@ download_connection_t* get_download_connection(download_pool_t* pool, peer_t* pe
 
 upload_connection_t* get_upload_connection(upload_pool_t* pool, peer_t* peer) {
 	int i = 0; 
-	up_connection_t** conns = pool->connection;
-	while( i<= config.max_conn) {
+	upload_connection_t** conns = pool->connection;
+	while( config.max_conn >= i) {
 		if( pool->flag[i] == 1 && conns[i]->receiver->id == peer->id) {
 			return conns[i];	
 		}
@@ -121,7 +126,7 @@ upload_connection_t* get_upload_connection(upload_pool_t* pool, peer_t* peer) {
 }
 
 
-void update_upload_connection(up_connection_t* conn, peer_t* peer, data_packet_t* get_pkt) {
+void update_upload_connection(upload_connection_t* conn, peer_t* peer, data_packet_t* get_pkt) {
 	// construct new data pkt array
 	data_packet_t** data_pkt_array = DATA_pkt_array_maker(get_pkt);
 	conn->receiver = peer;
@@ -133,7 +138,7 @@ void update_upload_connection(up_connection_t* conn, peer_t* peer, data_packet_t
 	conn->ssthresh = INIT_SSTHRESH;
 }
 
-void update_download_connection( download_connection_t* conn, peer_t* peer) {
+void update_download_connection(download_connection_t* conn, peer_t* peer) {
 	// removed finished GET request
 	conn->next_pkt = 1;
 }

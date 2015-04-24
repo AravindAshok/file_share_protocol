@@ -13,7 +13,7 @@
 #include<unistd.h>
 #include<stdlib.h>
 
-#include "md-5.h"
+#include "md5.h"
 #include "chunk.h"
 
 static int num_chunks();
@@ -44,6 +44,7 @@ int main(int argc, char *argv){
     for(i=0;i<numchunks;i++){
     hashes[i] = calloc(sizeof(uint8_t), (MD5_HASH_SIZE))
 
+    /****Sanity Testing***/
     if(hashes[i] == NULL){
         fprintf(stderr, "Out of memory !!");
         exit(-1);
@@ -73,10 +74,11 @@ int find_numchunks(char *filename){
     if( !stat(filename, &file)) {
 
         double size_file = (double) file.st_size;
-        return ceil(length/ CHUNK_SIZE);
+        return ceil(size_file/ CHUNK_SIZE);
     }
     else{
         //return error
-        return -1
+        return -1;
     }
 }
+

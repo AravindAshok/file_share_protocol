@@ -3,8 +3,7 @@
 
 
 #include <stdlib.h>
-#include "sha.h"
-#include "bt_parse.h"
+#include "md5.h"
 
 
 typedef struct node_s {
