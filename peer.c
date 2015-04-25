@@ -52,6 +52,15 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+void process_user_input(){
+
+
+
+
+
+
+}
+
 
 void process_tcp(int sock) {
     int packet_type = -1;

@@ -78,7 +78,7 @@ int init_job(char* chunkFile, char* output_file) {
 
 data_packet_t *generate_packet(int type, short pkt_len, u_int seq,
                             u_int ack, char *data) {
-    data_packet_t *pkt = (data_packet_t *)malloc(sizeof(data_packet_t));
+    data_packet_t *pkt = (data_packet_zt *)malloc(sizeof(data_packet_t));
     pkt->header.magicnum = 4399; /* Magic number */
     pkt->header.version = 1;      /* Version number */
     pkt->header.packet_type = type; /* Packet Type */
