@@ -1,8 +1,8 @@
-#####################################################################################
+##############################################################################################
 #Author: Kiran Kumar Lekkala
 #Date: 13 April 2015
-#Description: builds and compiles the necessary files
-#####################################################################################
+#Description: Makefile to build and compile the necessary files for generating peer executable
+##############################################################################################
 
 CFLAGS        = -g -Wall -DDEBUG -03
 CC            = gcc
