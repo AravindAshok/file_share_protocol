@@ -2,7 +2,7 @@
  *Author:  Kiran Kumar Lekkala
  *Date:  15 April 2015
  *Filename: peer.c
- *Description: main program for file share protocol
+ *Description: main program which runs the file share protocol
 
 
  ***************************************************************************/
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
     strcpy(config.chunk_file, "chunkfile");
     strcpy(config.has_chunk_file, "haschunks");
 #endif
-    
+
     printf("Peer initialized.... \nYou are good to go now !!!\n");
     peer_run(&config);
     return 0;
@@ -442,7 +442,7 @@ If you use it, and if the socket type is SOCK_STREAM and the family is AF_INET, 
         FD_ZERO(&readfds);
         FD_SET(STDIN_FILENO, &readfds);
         FD_SET(sock, &readfds);
-        
+
         tv.tv_sec = 10; /* Wait up to 10 seconds. */
         tv.tv_usec = 0;
 
@@ -458,7 +458,7 @@ If you use it, and if the socket type is SOCK_STREAM and the family is AF_INET, 
                 process_user_input(STDIN_FILENO, userbuf, handle_user_input,
                  "Currently unused");
             }
-        } 
+        }
     }
 }
 void init_hasChunk(char* chunk_file) {
