@@ -13,15 +13,15 @@ extern queue_t* hasChunk;
 
 
 static const char *type2str={"INDEXGET_SHORTLIST_"
-			     "INDEXGET_LONGLIST_"    
-                             "INDEXGET_REGEX_"	
-                             "FILEHASH_VERIFY_"	
+			     "INDEXGET_LONGLIST_"
+                             "INDEXGET_REGEX_"
+                             "FILEHASH_VERIFY_"
                              "FILEHASH_CHECKALL_"
-                             "FILEDOWNLOAD_"	
-                             "FILEUPLOAD_"	
-                             "FILEUPLOAD_ALLOW_" 
+                             "FILEDOWNLOAD_"
+                             "FILEUPLOAD_"
+                             "FILEUPLOAD_ALLOW_"
                              "FILEUPLOAD_DENY_"
-                             }	
+                             }
 
 
 int init_job(char* chunkFile, char* output_file) {
@@ -34,25 +34,25 @@ int init_job(char* chunkFile, char* output_file) {
     char read_buffer[BUF_SIZE];
     char hash_buffer[MD5_HASH_SIZE*2];
 
-    
+
     /* get chunks number */
     while (fgets(read_buffer, BUF_SIZE,file)) {
         line_number++;
     }
     memset(read_buffer,0,BUF_SIZE);
-    
+
     job.num_chunk = line_number;
     job.num_need = line_number;
     job.num_living = 0;
     job.chunks = malloc(sizeof(chunk_t) * job.num_chunk);
-    
+
     /* set ptr to the beginning */
     fseek(file,0,SEEK_SET);
-    
+
     while (fgets(read_buffer,BUF_SIZE,file)) {
         sscanf(read_buffer,"%d %s",&(job.chunks[i].id),hash_buffer);
         /* convert ascii to binary hash code */
-        hex2binary(hash_buffer,MD5_HASH_SIZE*2,job.chunks[i].hash);        
+        hex2binary(hash_buffer,MD5_HASH_SIZE*2,job.chunks[i].hash);
         memset(read_buffer,0,BUF_SIZE);
         memset(hash_buffer,0,MD5_HASH_SIZE*2);
         job.chunks[i].pvd = NULL;
@@ -60,7 +60,7 @@ int init_job(char* chunkFile, char* output_file) {
         job.chunks[i].cur_size = 0;
         job.chunks[i].data = malloc(sizeof(char)*512*1024);
         i++;
-    }    
+    }
     fclose(file);
     // set output file address and format
     strcpy(config.output_file,output_file);
@@ -70,7 +70,7 @@ int init_job(char* chunkFile, char* output_file) {
 
     //gettimeofday(&(job.start_time), NULL);
     //fprintf(job.cwnd, "Start!\n");
-    
+
     // successfully initilize job
     return 0;
 }
@@ -86,7 +86,7 @@ data_packet_t *generate_packet(int type, short pkt_len, u_int seq,
     pkt->header.packet_len = pkt_len;
     pkt->header.seq_num = seq;
     pkt->header.ack_num = ack;
-    if( pkt->data != NULL) 
+    if( pkt->data != NULL)
         memcpy(pkt->data, data, pkt_len - HEADERLEN);
     return pkt;
 }
@@ -113,7 +113,7 @@ data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt) {
     int data_fd;
 
     if(index_file == NULL) {
-        fprintf(stderr, "Fail to open chunk file!!\n"); 
+        fprintf(stderr, "Fail to open chunk file!!\n");
         return NULL;
     }
     // get data file address
@@ -123,7 +123,7 @@ data_packet_t** DATA_pkt_array_maker(data_packet_t* pkt) {
     // skip the next line
     fgets(buffer,BT_FILENAME_LEN,index_file);
 
-    // open file to read 
+    // open file to read
     data_fd = open(datafile, O_RDONLY);
     fstat (data_fd, &statbuf);
     src = mmap(0, statbuf.st_size, PROT_READ, MAP_SHARED, data_fd, 0);
@@ -314,7 +314,7 @@ int chunk_download_done(chunk_t* chunk){
 
     if( memcmp(hash,chunk->hash,MD5_HASH_SIZE) == 0) {
         return 1;
-    }    
+    }
     else{
         return -1;
     }

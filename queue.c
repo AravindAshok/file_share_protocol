@@ -1,3 +1,6 @@
+/* Code to initialize function */
+
+
 #include "queue.h"
 #include <stdio.h>
 
